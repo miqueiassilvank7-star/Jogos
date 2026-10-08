@@ -4,139 +4,139 @@
     "name": "BOMBERMAN",
     "command": "bomberman",
     "desc": "Bomberman: coloque bombas, exploda caixas e sobreviva.",
-    "wa": "https://wa.me/639678247845?text=%2Abomberman"
+    "wa": "https://wa.me/639678247845?text=%2Abomberman%20jogar"
   },
   {
     "slug": "bounce",
     "name": "Bounce",
     "command": "bounce",
     "desc": "Jogue Bounce Tales no Takeshi Arcade!",
-    "wa": "https://wa.me/639678247845?text=%2Abounce"
+    "wa": "https://wa.me/639678247845?text=%2Abounce%20jogar"
   },
   {
     "slug": "breakout",
     "name": "BREAKOUT",
     "command": "breakout",
     "desc": "Breakout jogável por toque dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Abreakout"
+    "wa": "https://wa.me/639678247845?text=%2Abreakout%20jogar"
   },
   {
     "slug": "cacapalavras",
     "name": "Cacapalavras",
     "command": "cacapalavras",
     "desc": "Caça-palavras: muitas fases, encontre as palavras escondidas.",
-    "wa": "https://wa.me/639678247845?text=%2Acacapalavras"
+    "wa": "https://wa.me/639678247845?text=%2Acacapalavras%20jogar"
   },
   {
     "slug": "calculadora",
     "name": "CALCULADORA",
     "command": "calculadora",
     "desc": "Calculadora interativa dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Acalculadora"
+    "wa": "https://wa.me/639678247845?text=%2Acalculadora%20jogar"
   },
   {
     "slug": "carro",
     "name": "CARRO",
     "command": "carro",
     "desc": "Desvie dos carros e faça a maior pontuação.",
-    "wa": "https://wa.me/639678247845?text=%2Acarro"
+    "wa": "https://wa.me/639678247845?text=%2Acarro%20jogar"
   },
   {
     "slug": "colorir",
     "name": "Colorir",
     "command": "colorir",
     "desc": "Livro de colorir: escolha um desenho e pinte com as cores.",
-    "wa": "https://wa.me/639678247845?text=%2Acolorir"
+    "wa": "https://wa.me/639678247845?text=%2Acolorir%20jogar"
   },
   {
     "slug": "dino",
     "name": "DINO RUNNER",
     "command": "dino",
     "desc": "Dino Runner jogável dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Adino"
+    "wa": "https://wa.me/639678247845?text=%2Adino%20jogar"
   },
   {
     "slug": "eclipse",
     "name": "Eclipse",
     "command": "eclipse",
     "desc": "Eclipse: atire nas esferas inimigas e sobreviva.",
-    "wa": "https://wa.me/639678247845?text=%2Aeclipse"
+    "wa": "https://wa.me/639678247845?text=%2Aeclipse%20jogar"
   },
   {
     "slug": "flappy-bird",
     "name": "FLAPPY BIRD",
     "command": "flappybird",
     "desc": "Flappy Bird jogável dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Aflappybird"
+    "wa": "https://wa.me/639678247845?text=%2Aflappybird%20jogar"
   },
   {
     "slug": "piano",
     "name": "NEON PIANO",
     "command": "piano",
     "desc": "Neon Piano jogável dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Apiano"
+    "wa": "https://wa.me/639678247845?text=%2Apiano%20jogar"
   },
   {
     "slug": "pianorich",
     "name": "NEON PIANO",
     "command": "pianorich",
     "desc": "Neon Piano jogável dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Apianorich"
+    "wa": "https://wa.me/639678247845?text=%2Apianorich%20jogar"
   },
   {
     "slug": "pong",
     "name": "NEON PONG",
     "command": "richpong",
     "desc": "Pong contra a CPU dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Arichpong"
+    "wa": "https://wa.me/639678247845?text=%2Arichpong%20jogar"
   },
   {
     "slug": "rich2048",
     "name": "2048",
     "command": "rich2048",
     "desc": "2048 jogável por toque dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Arich2048"
+    "wa": "https://wa.me/639678247845?text=%2Arich2048%20jogar"
   },
   {
     "slug": "richslots",
     "name": "NEON SLOTS",
     "command": "richslots",
     "desc": "Neon Slots jogável dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Arichslots"
+    "wa": "https://wa.me/639678247845?text=%2Arichslots%20jogar"
   },
   {
     "slug": "richsnake",
     "name": "NEON SNAKE",
     "command": "richsnake",
     "desc": "Snake jogável por toque dentro do WhatsApp.",
-    "wa": "https://wa.me/639678247845?text=%2Arichsnake"
+    "wa": "https://wa.me/639678247845?text=%2Arichsnake%20jogar"
   },
   {
     "slug": "richxo",
     "name": "JOGO DA VELHA",
     "command": "richxo",
     "desc": "Jogo da Velha Rich contra IA ou para dois jogadores.",
-    "wa": "https://wa.me/639678247845?text=%2Arichxo"
+    "wa": "https://wa.me/639678247845?text=%2Arichxo%20jogar"
   },
   {
     "slug": "tetris",
     "name": "Tetris",
     "command": "tetris",
     "desc": "Jogo do MSNK7BOT.",
-    "wa": "https://wa.me/639678247845?text=%2Atetris"
+    "wa": "https://wa.me/639678247845?text=%2Atetris%20jogar"
   },
   {
     "slug": "tiroaoalvo",
     "name": "Tiroaoalvo",
     "command": "tiroaoalvo",
     "desc": "Tiro ao alvo: acerte os alvos antes que sumam.",
-    "wa": "https://wa.me/639678247845?text=%2Atiroaoalvo"
+    "wa": "https://wa.me/639678247845?text=%2Atiroaoalvo%20jogar"
   },
   {
     "slug": "xadrez",
     "name": "Xadrez",
     "command": "xadrez",
     "desc": "Jogo de xadrez com dois jogadores ou contra IA.",
-    "wa": "https://wa.me/639678247845?text=%2Axadrez"
+    "wa": "https://wa.me/639678247845?text=%2Axadrez%20jogar"
   }
 ]
