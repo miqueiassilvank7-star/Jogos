@@ -1,0 +1,600 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Jogo de Combate</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head>
+<style>
+
+:root{
+  --accent-a:#8b6cf0;
+  --accent-b:#4fa8e0;
+  --ink:#f2f5f7;
+  --ink-dim:rgba(242,245,247,.55);
+  --ink-faint:rgba(242,245,247,.4);
+}
+*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-sizing:border-box}
+body{margin:0;background:transparent;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);touch-action:manipulation}
+.wrap{width:100%;max-width:620px;margin:auto;padding:16px}
+.card{background:linear-gradient(180deg,rgba(34,45,53,.97),rgba(24,33,40,.97));border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.head{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent-b);opacity:.85}
+.title{font-size:16px;font-weight:800;color:#fff;letter-spacing:.3px;margin-top:2px}
+.stats{display:flex;gap:16px;text-align:right}
+.value{font:800 17px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff;font-variant-numeric:tabular-nums}
+.label{font-size:8px;font-weight:700;color:var(--ink-faint);letter-spacing:1.2px;margin-bottom:3px}
+.main{padding:16px}
+.board{position:relative;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.05),rgba(0,0,0,0) 60%),rgba(4,9,12,.4);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:inset 0 0 24px rgba(0,0,0,.35)}
+.board canvas{display:block;width:100%;height:auto}
+.controls{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.button{min-height:46px;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;font-weight:700;font-size:12px;letter-spacing:.3px;background:rgba(255,255,255,.06);padding:0 16px;transition:transform .08s ease,filter .08s ease}
+.button:active{transform:scale(.94);filter:brightness(1.15)}
+.primary{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));border-color:rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(139,108,240,.35)}
+.status{text-align:center;font:10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink-faint);letter-spacing:.3px;margin-top:12px;min-height:12px}
+.overlay{position:absolute;inset:0;background:rgba(10,15,19,.88);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:5;animation:fade-in .18s ease}
+.overlay.hidden{display:none}
+.overlay-title{font-size:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,#fff,var(--accent-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.overlay-sub{font-size:11px;color:var(--ink-dim);letter-spacing:.2px;margin-top:8px;max-width:280px}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+
+
+.info{
+  text-align:center;
+  margin-bottom:14px;
+}
+
+.info h2{
+  margin:0;
+  font-size:20px;
+  color:#fff;
+}
+
+.info p{
+  margin:6px 0 0;
+  font-size:11px;
+  color:var(--ink-dim);
+}
+
+.fighters{
+  display:grid;
+  grid-template-columns:1fr 40px 1fr;
+  align-items:center;
+  gap:10px;
+}
+
+.fighter{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  padding:14px 10px;
+  text-align:center;
+}
+
+.avatar{
+  font-size:42px;
+  line-height:1;
+  margin-bottom:8px;
+}
+
+.fighter-name{
+  font-size:12px;
+  font-weight:800;
+  color:#fff;
+  margin-bottom:8px;
+}
+
+.hp{
+  height:9px;
+  background:rgba(255,255,255,.1);
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.hp-fill{
+  height:100%;
+  width:100%;
+  background:#4ade80;
+  border-radius:20px;
+  transition:width .3s ease;
+}
+
+.hp-fill.enemy{
+  background:#ef4444;
+}
+
+.hp-text{
+  margin-top:6px;
+  font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace;
+  color:var(--ink-dim);
+}
+
+.vs{
+  text-align:center;
+  font-size:13px;
+  font-weight:900;
+  color:#fff;
+}
+
+.form{
+  margin-top:14px;
+}
+
+.input{
+  width:100%;
+  height:44px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  background:rgba(0,0,0,.2);
+  color:#fff;
+  padding:0 12px;
+  outline:none;
+  font-size:13px;
+}
+
+.input:focus{
+  border-color:var(--accent-b);
+}
+
+.log{
+  margin-top:12px;
+  min-height:70px;
+  max-height:120px;
+  overflow:auto;
+  background:rgba(0,0,0,.2);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;
+  padding:10px;
+  font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;
+  color:var(--ink-dim);
+}
+
+.log div{
+  margin-bottom:3px;
+}
+
+.choice{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.choice .button{
+  flex:1;
+}
+
+.hidden{
+  display:none !important;
+}
+
+.damage{
+  animation:damage .25s ease;
+}
+
+@keyframes damage{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  50%{transform:translateX(5px)}
+  75%{transform:translateX(-3px)}
+  100%{transform:translateX(0)}
+}
+</style>
+
+<div class="wrap">
+  <div class="card">
+
+    <div class="head">
+      <div>
+        <div class="brand">MSNK7BOT</div>
+        <div class="title">⚔️ Jogo de Combate</div>
+      </div>
+
+      <div class="stats">
+        <div>
+          <div class="label">STATUS</div>
+          <div class="value" id="status">MENU</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <div id="setup">
+
+        <div class="info">
+          <h2>🎮 Prepare-se!</h2>
+          <p>Digite seus dados para entrar no combate.</p>
+        </div>
+
+        <div class="form">
+
+          <input
+            id="playerName"
+            class="input"
+            type="text"
+            placeholder="Nome do jogador"
+            maxlength="20"
+          >
+
+          <br><br>
+
+          <input
+            id="playerAge"
+            class="input"
+            type="number"
+            placeholder="Sua idade"
+            min="1"
+            max="120"
+          >
+
+        </div>
+
+        <div class="controls">
+          <button class="button primary" id="startBtn">
+            ⚔️ COMEÇAR
+          </button>
+        </div>
+
+      </div>
+
+      <div id="battle" class="hidden">
+
+        <div class="fighters">
+
+          <div class="fighter" id="playerCard">
+
+            <div class="avatar">🧑</div>
+
+            <div class="fighter-name" id="playerDisplay">
+              Jogador
+            </div>
+
+            <div class="hp">
+              <div class="hp-fill" id="playerHpBar"></div>
+            </div>
+
+            <div class="hp-text" id="playerHpText">
+              100 / 100 HP
+            </div>
+
+          </div>
+
+          <div class="vs">
+            VS
+          </div>
+
+          <div class="fighter" id="enemyCard">
+
+            <div class="avatar">👮</div>
+
+            <div class="fighter-name">
+              Policial
+            </div>
+
+            <div class="hp">
+              <div class="hp-fill enemy" id="enemyHpBar"></div>
+            </div>
+
+            <div class="hp-text" id="enemyHpText">
+              100 / 100 HP
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="status" id="battleStatus">
+          Escolha uma ação.
+        </div>
+
+        <div class="controls">
+
+          <button
+            class="button primary"
+            id="attackBtn"
+          >
+            ⚔️ ATACAR
+          </button>
+
+        </div>
+
+        <div class="log" id="log">
+          <div>🎮 O combate começou!</div>
+        </div>
+
+        <div class="controls">
+
+          <button
+            class="button hidden"
+            id="restartBtn"
+          >
+            🔄 JOGAR NOVAMENTE
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+
+(function(){
+
+  const setup = document.getElementById("setup");
+  const battle = document.getElementById("battle");
+
+  const playerName = document.getElementById("playerName");
+  const playerAge = document.getElementById("playerAge");
+
+  const startBtn = document.getElementById("startBtn");
+  const attackBtn = document.getElementById("attackBtn");
+  const restartBtn = document.getElementById("restartBtn");
+
+  const playerDisplay = document.getElementById("playerDisplay");
+
+  const playerHpBar = document.getElementById("playerHpBar");
+  const enemyHpBar = document.getElementById("enemyHpBar");
+
+  const playerHpText = document.getElementById("playerHpText");
+  const enemyHpText = document.getElementById("enemyHpText");
+
+  const playerCard = document.getElementById("playerCard");
+  const enemyCard = document.getElementById("enemyCard");
+
+  const battleStatus = document.getElementById("battleStatus");
+  const log = document.getElementById("log");
+  const status = document.getElementById("status");
+
+  let playerHp = 100;
+  let enemyHp = 100;
+
+  const maxHp = 100;
+
+  let name = "";
+  let age = 0;
+
+  function random(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function addLog(text){
+
+    const line = document.createElement("div");
+
+    line.textContent = text;
+
+    log.appendChild(line);
+
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function updateHp(){
+
+    playerHp = Math.max(0, playerHp);
+    enemyHp = Math.max(0, enemyHp);
+
+    playerHpBar.style.width =
+      playerHp + "%";
+
+    enemyHpBar.style.width =
+      enemyHp + "%";
+
+    playerHpText.textContent =
+      playerHp + " / " + maxHp + " HP";
+
+    enemyHpText.textContent =
+      enemyHp + " / " + maxHp + " HP";
+
+  }
+
+  function damageAnimation(element){
+
+    element.classList.remove("damage");
+
+    void element.offsetWidth;
+
+    element.classList.add("damage");
+
+  }
+
+  function startGame(){
+
+    name = playerName.value.trim();
+
+    age = Number(playerAge.value);
+
+    if(!name){
+
+      alert("Digite seu nome!");
+
+      return;
+
+    }
+
+    if(!age || age < 1){
+
+      alert("Digite uma idade válida!");
+
+      return;
+
+    }
+
+    playerHp = random(70, 100);
+    enemyHp = random(70, 100);
+
+    playerDisplay.textContent = name;
+
+    updateHp();
+
+    setup.classList.add("hidden");
+
+    battle.classList.remove("hidden");
+
+    status.textContent = "COMBATE";
+
+    battleStatus.textContent =
+      "⚔️ " + name + ", ataque o policial!";
+
+    log.innerHTML = "";
+
+    addLog("🎮 Combate iniciado!");
+
+    addLog(
+      "🧑 " + name +
+      " entrou com " +
+      playerHp +
+      " HP."
+    );
+
+    addLog(
+      "👮 O policial entrou com " +
+      enemyHp +
+      " HP."
+    );
+
+  }
+
+  function attack(){
+
+    if(playerHp <= 0 || enemyHp <= 0){
+
+      return;
+
+    }
+
+    attackBtn.disabled = true;
+
+    const playerDamage = random(8, 22);
+
+    enemyHp -= playerDamage;
+
+    damageAnimation(enemyCard);
+
+    updateHp();
+
+    addLog(
+      "⚔️ Você atacou e causou " +
+      playerDamage +
+      " de dano!"
+    );
+
+    battleStatus.textContent =
+      "💥 Você acertou o policial!";
+
+    if(enemyHp <= 0){
+
+      win();
+
+      return;
+
+    }
+
+    setTimeout(function(){
+
+      const enemyDamage = random(5, 18);
+
+      playerHp -= enemyDamage;
+
+      damageAnimation(playerCard);
+
+      updateHp();
+
+      addLog(
+        "👮 O policial contra-atacou e causou " +
+        enemyDamage +
+        " de dano!"
+      );
+
+      battleStatus.textContent =
+        "💢 O policial contra-atacou!";
+
+      if(playerHp <= 0){
+
+        lose();
+
+        return;
+
+      }
+
+      attackBtn.disabled = false;
+
+    }, 650);
+
+  }
+
+  function win(){
+
+    attackBtn.classList.add("hidden");
+
+    restartBtn.classList.remove("hidden");
+
+    status.textContent = "VITÓRIA";
+
+    battleStatus.textContent =
+      "🏆 VOCÊ VENCEU!";
+
+    addLog(
+      "🏆 " + name +
+      " derrotou o policial!"
+    );
+
+  }
+
+  function lose(){
+
+    attackBtn.classList.add("hidden");
+
+    restartBtn.classList.remove("hidden");
+
+    status.textContent = "DERROTA";
+
+    battleStatus.textContent =
+      "💀 VOCÊ PERDEU!";
+
+    addLog(
+      "💀 " + name +
+      " foi derrotado pelo policial."
+    );
+
+  }
+
+  function restart(){
+
+    playerHp = 100;
+    enemyHp = 100;
+
+    updateHp();
+
+    attackBtn.classList.remove("hidden");
+
+    restartBtn.classList.add("hidden");
+
+    attackBtn.disabled = false;
+
+    status.textContent = "COMBATE";
+
+    battleStatus.textContent =
+      "⚔️ Novo combate iniciado!";
+
+    log.innerHTML = "";
+
+    addLog("🔄 Novo combate!");
+
+  }
+
+  startBtn.addEventListener(
+    "click",
+    startGame
+  );
+
+  attackBtn.addEventListener(
+    "click",
+    attack
+  );
+
+  restartBtn.addEventListener(
+    "click",
+    restart
+  );
+
+})();
+
+</script>
+<a class="voltar" href="../" target="_top">← Catálogo</a><script>if(window.top!==window.self){var v=document.querySelector(".voltar");if(v)v.style.display="none"}</script></html>

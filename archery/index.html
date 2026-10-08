@@ -1,0 +1,1326 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Archery</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head>
+<style>
+
+:root{
+  --accent-a:#8b6cf0;
+  --accent-b:#4fa8e0;
+  --ink:#f2f5f7;
+  --ink-dim:rgba(242,245,247,.55);
+  --ink-faint:rgba(242,245,247,.4);
+}
+*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-sizing:border-box}
+body{margin:0;background:transparent;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);touch-action:manipulation}
+.wrap{width:100%;max-width:620px;margin:auto;padding:16px}
+.card{background:linear-gradient(180deg,rgba(34,45,53,.97),rgba(24,33,40,.97));border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.head{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent-b);opacity:.85}
+.title{font-size:16px;font-weight:800;color:#fff;letter-spacing:.3px;margin-top:2px}
+.stats{display:flex;gap:16px;text-align:right}
+.value{font:800 17px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff;font-variant-numeric:tabular-nums}
+.label{font-size:8px;font-weight:700;color:var(--ink-faint);letter-spacing:1.2px;margin-bottom:3px}
+.main{padding:16px}
+.board{position:relative;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.05),rgba(0,0,0,0) 60%),rgba(4,9,12,.4);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:inset 0 0 24px rgba(0,0,0,.35)}
+.board canvas{display:block;width:100%;height:auto}
+.controls{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.button{min-height:46px;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;font-weight:700;font-size:12px;letter-spacing:.3px;background:rgba(255,255,255,.06);padding:0 16px;transition:transform .08s ease,filter .08s ease}
+.button:active{transform:scale(.94);filter:brightness(1.15)}
+.primary{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));border-color:rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(139,108,240,.35)}
+.status{text-align:center;font:10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink-faint);letter-spacing:.3px;margin-top:12px;min-height:12px}
+.overlay{position:absolute;inset:0;background:rgba(10,15,19,.88);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:5;animation:fade-in .18s ease}
+.overlay.hidden{display:none}
+.overlay-title{font-size:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,#fff,var(--accent-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.overlay-sub{font-size:11px;color:var(--ink-dim);letter-spacing:.2px;margin-top:8px;max-width:280px}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: #202020;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+}
+
+#archery {
+  width: 100%;
+  max-width: 650px;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: linear-gradient(
+    #67bff2 0%,
+    #bdeaff 62%,
+    #5fa83d 62%,
+    #3e812d 100%
+  );
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,.12);
+  touch-action: none;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 2px;
+  gap: 6px;
+}
+
+.info {
+  background: #303030;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+#message {
+  height: 25px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: bold;
+  margin: 2px 0 5px;
+}
+
+.controls {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1.35fr 1fr;
+  gap: 6px;
+}
+
+.controls button {
+  border: 0;
+  border-radius: 11px;
+  min-height: 45px;
+  background: #343434;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  touch-action: manipulation;
+}
+
+.controls button:active {
+  transform: scale(.96);
+}
+
+#shoot {
+  background: #88ce02;
+  color: #111;
+}
+
+#restart {
+  grid-column: 1 / 4;
+  background: #444;
+}
+
+.power-box {
+  width: 100%;
+  height: 9px;
+  background: #333;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 4px 0 7px;
+}
+
+#power {
+  height: 100%;
+  width: 0%;
+  background: #88ce02;
+  transition: width .03s linear;
+}
+
+.help {
+  text-align: center;
+  color: rgba(255,255,255,.45);
+  font-size: 11px;
+  margin-top: 5px;
+}
+</style>
+
+<div id="archery">
+
+  <div class="hud">
+    <div class="info">🏹 <span id="score">0</span></div>
+    <div class="info">🎯 <span id="shots">10</span></div>
+  </div>
+
+  <canvas id="game" width="900" height="450"></canvas>
+
+  <div id="message"></div>
+
+  <div class="power-box">
+    <div id="power"></div>
+  </div>
+
+  <div class="controls">
+
+    <button id="left">
+      ⬅️ MIRAR
+    </button>
+
+    <button id="shoot">
+      🏹 ATIRAR
+    </button>
+
+    <button id="right">
+      MIRAR ➡️
+    </button>
+
+    <button id="restart">
+      🔄 NOVO JOGO
+    </button>
+
+  </div>
+
+  <div class="help">
+    Segure ATIRAR para aumentar a força e solte para lançar.
+  </div>
+
+</div>
+
+<script>
+(function () {
+
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  const scoreElement =
+    document.getElementById("score");
+
+  const shotsElement =
+    document.getElementById("shots");
+
+  const messageElement =
+    document.getElementById("message");
+
+  const powerElement =
+    document.getElementById("power");
+
+  const leftButton =
+    document.getElementById("left");
+
+  const rightButton =
+    document.getElementById("right");
+
+  const shootButton =
+    document.getElementById("shoot");
+
+  const restartButton =
+    document.getElementById("restart");
+
+
+  /*
+   * ============================
+   * CONFIGURAÇÃO
+   * ============================
+   */
+
+  const W = canvas.width;
+  const H = canvas.height;
+
+  const bow = {
+    x: 100,
+    y: 285
+  };
+
+  const target = {
+    x: 785,
+    y: 220
+  };
+
+  let angle = -0.18;
+
+  const minAngle = -0.55;
+  const maxAngle = 0.12;
+
+  let power = 0;
+
+  let charging = false;
+
+  let chargeStart = 0;
+
+  let score = 0;
+
+  let shots = 10;
+
+  let gameOver = false;
+
+  let flyingArrows = [];
+
+  let hitEffects = [];
+
+
+  /*
+   * ============================
+   * FUNÇÕES
+   * ============================
+   */
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+
+  function updateHUD() {
+
+    scoreElement.textContent = score;
+    shotsElement.textContent = shots;
+
+    powerElement.style.width =
+      Math.round(power * 100) + "%";
+  }
+
+
+  function message(text) {
+
+    messageElement.textContent = text;
+
+    setTimeout(function () {
+
+      if (messageElement.textContent === text) {
+        messageElement.textContent = "";
+      }
+
+    }, 900);
+  }
+
+
+  /*
+   * ============================
+   * DESENHO DO CENÁRIO
+   * ============================
+   */
+
+  function drawBackground() {
+
+    /*
+     * Sol
+     */
+
+    ctx.beginPath();
+
+    ctx.arc(
+      110,
+      75,
+      35,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fillStyle = "#ffe66d";
+    ctx.fill();
+
+
+    /*
+     * Nuvens
+     */
+
+    drawCloud(270, 75);
+    drawCloud(600, 90);
+
+
+    /*
+     * Árvores
+     */
+
+    drawTree(700, 285, 55);
+    drawTree(870, 290, 45);
+
+
+    /*
+     * chão
+     */
+
+    ctx.fillStyle = "#4c9635";
+
+    ctx.fillRect(
+      0,
+      285,
+      W,
+      H - 285
+    );
+
+
+    /*
+     * grama
+     */
+
+    ctx.strokeStyle = "#6dbd4b";
+    ctx.lineWidth = 2;
+
+    for (let x = 0; x < W; x += 18) {
+
+      ctx.beginPath();
+
+      ctx.moveTo(x, 292);
+      ctx.lineTo(x + 5, 286);
+
+      ctx.stroke();
+    }
+  }
+
+
+  function drawCloud(x, y) {
+
+    ctx.fillStyle =
+      "rgba(255,255,255,.75)";
+
+    ctx.beginPath();
+
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+
+    ctx.arc(
+      x + 25,
+      y - 8,
+      27,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.arc(
+      x + 55,
+      y,
+      20,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+  }
+
+
+  function drawTree(x, y, size) {
+
+    ctx.fillStyle = "#70451f";
+
+    ctx.fillRect(
+      x - 7,
+      y - size,
+      14,
+      size
+    );
+
+    ctx.fillStyle = "#28752c";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      x,
+      y - size,
+      size * .65,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+  }
+
+
+  /*
+   * ============================
+   * ALVO
+   * ============================
+   */
+
+  function drawTarget() {
+
+    /*
+     * suporte
+     */
+
+    ctx.strokeStyle = "#70421e";
+    ctx.lineWidth = 8;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      target.x,
+      target.y + 48
+    );
+
+    ctx.lineTo(
+      target.x,
+      320
+    );
+
+    ctx.stroke();
+
+
+    /*
+     * sombra
+     */
+
+    ctx.fillStyle =
+      "rgba(0,0,0,.2)";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+      target.x,
+      323,
+      58,
+      9,
+      0,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /*
+     * alvo externo
+     */
+
+    ctx.beginPath();
+
+    ctx.arc(
+      target.x,
+      target.y,
+      55,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+
+    ctx.strokeStyle = "#333";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+
+    /*
+     * vermelho
+     */
+
+    ctx.beginPath();
+
+    ctx.arc(
+      target.x,
+      target.y,
+      42,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fillStyle = "#f4531c";
+    ctx.fill();
+
+
+    /*
+     * branco
+     */
+
+    ctx.beginPath();
+
+    ctx.arc(
+      target.x,
+      target.y,
+      28,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+
+
+    /*
+     * centro
+     */
+
+    ctx.beginPath();
+
+    ctx.arc(
+      target.x,
+      target.y,
+      14,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fillStyle = "#f4531c";
+    ctx.fill();
+  }
+
+
+  /*
+   * ============================
+   * ARCO
+   * ============================
+   */
+
+  function drawBow() {
+
+    const pull =
+      charging ? power * 32 : 0;
+
+    ctx.save();
+
+    ctx.translate(
+      bow.x,
+      bow.y
+    );
+
+    ctx.rotate(angle);
+
+
+    /*
+     * arco
+     */
+
+    ctx.strokeStyle = "#dcdcdc";
+    ctx.lineWidth = 7;
+
+    ctx.beginPath();
+
+    ctx.moveTo(0, -65);
+
+    ctx.quadraticCurveTo(
+      -38,
+      0,
+      0,
+      65
+    );
+
+    ctx.stroke();
+
+
+    /*
+     * corda
+     */
+
+    const stringX = -pull;
+
+    ctx.strokeStyle = "#eeeeee";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+    ctx.moveTo(0, -65);
+
+    ctx.lineTo(
+      stringX,
+      0
+    );
+
+    ctx.lineTo(
+      0,
+      65
+    );
+
+    ctx.stroke();
+
+
+    /*
+     * flecha carregada
+     */
+
+    ctx.strokeStyle = "#444";
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      stringX - 6,
+      0
+    );
+
+    ctx.lineTo(
+      80,
+      0
+    );
+
+    ctx.stroke();
+
+
+    /*
+     * ponta
+     */
+
+    ctx.fillStyle = "#222";
+
+    ctx.beginPath();
+
+    ctx.moveTo(86, 0);
+    ctx.lineTo(70, -6);
+    ctx.lineTo(70, 6);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /*
+     * pena verde
+     */
+
+    ctx.fillStyle = "#88ce02";
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      stringX + 5,
+      0
+    );
+
+    ctx.lineTo(
+      stringX - 13,
+      -7
+    );
+
+    ctx.lineTo(
+      stringX - 13,
+      7
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+
+  /*
+   * ============================
+   * TRAJETÓRIA
+   * ============================
+   */
+
+  function drawTrajectory() {
+
+    if (!charging) return;
+
+    const distance =
+      180 + power * 260;
+
+    const endX =
+      bow.x +
+      Math.cos(angle) *
+      distance;
+
+    const endY =
+      bow.y +
+      Math.sin(angle) *
+      distance;
+
+    const controlX =
+      bow.x +
+      distance * .5;
+
+    const controlY =
+      bow.y +
+      Math.sin(angle) *
+      distance * .5 -
+      70;
+
+
+    ctx.save();
+
+    ctx.strokeStyle =
+      "rgba(255,255,255,.45)";
+
+    ctx.lineWidth = 2;
+
+    ctx.setLineDash([7, 8]);
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      bow.x,
+      bow.y
+    );
+
+    ctx.quadraticCurveTo(
+      controlX,
+      controlY,
+      endX,
+      endY
+    );
+
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+
+  /*
+   * ============================
+   * FLECHAS
+   * ============================
+   */
+
+  function drawArrow(a) {
+
+    ctx.save();
+
+    ctx.translate(
+      a.x,
+      a.y
+    );
+
+    ctx.rotate(a.rotation);
+
+
+    ctx.strokeStyle = "#444";
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+
+    ctx.moveTo(0, 0);
+
+    ctx.lineTo(75, 0);
+
+    ctx.stroke();
+
+
+    /*
+     * ponta
+     */
+
+    ctx.fillStyle = "#222";
+
+    ctx.beginPath();
+
+    ctx.moveTo(85, 0);
+    ctx.lineTo(70, -6);
+    ctx.lineTo(70, 6);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /*
+     * pena
+     */
+
+    ctx.fillStyle = "#88ce02";
+
+    ctx.beginPath();
+
+    ctx.moveTo(8, 0);
+    ctx.lineTo(-10, -7);
+    ctx.lineTo(-7, 0);
+    ctx.lineTo(-10, 7);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+
+  /*
+   * ============================
+   * EFEITO DE ACERTO
+   * ============================
+   */
+
+  function drawHitEffects() {
+
+    hitEffects.forEach(function (effect) {
+
+      ctx.save();
+
+      ctx.globalAlpha =
+        1 - effect.life;
+
+      ctx.strokeStyle = "#ffcc00";
+
+      ctx.lineWidth = 4;
+
+      ctx.beginPath();
+
+      ctx.arc(
+        effect.x,
+        effect.y,
+        15 + effect.life * 35,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.stroke();
+
+      ctx.restore();
+    });
+  }
+
+
+  /*
+   * ============================
+   * LANÇAR FLECHA
+   * ============================
+   */
+
+  function shoot() {
+
+    if (gameOver) return;
+
+    if (shots <= 0) return;
+
+    const shotPower =
+      Math.max(power, .2);
+
+    const shotAngle =
+      angle;
+
+    shots--;
+
+    updateHUD();
+
+
+    const speed =
+      7 +
+      shotPower * 13;
+
+
+    flyingArrows.push({
+
+      x: bow.x,
+
+      y: bow.y,
+
+      vx:
+        Math.cos(shotAngle) *
+        speed,
+
+      vy:
+        Math.sin(shotAngle) *
+        speed,
+
+      rotation:
+        shotAngle
+
+    });
+
+
+    if (shots <= 0) {
+
+      setTimeout(function () {
+
+        if (!gameOver) {
+
+          gameOver = true;
+
+          message(
+            "🏁 FIM! " +
+            score +
+            " PONTOS"
+          );
+
+        }
+
+      }, 1600);
+    }
+  }
+
+
+  /*
+   * ============================
+   * ATUALIZAR FLECHAS
+   * ============================
+   */
+
+  function updateArrows() {
+
+    for (
+      let i = flyingArrows.length - 1;
+      i >= 0;
+      i--
+    ) {
+
+      const a =
+        flyingArrows[i];
+
+
+      a.x += a.vx;
+      a.y += a.vy;
+
+      /*
+       * gravidade
+       */
+
+      a.vy += .18;
+
+
+      a.rotation =
+        Math.atan2(
+          a.vy,
+          a.vx
+        );
+
+
+      /*
+       * distância até alvo
+       */
+
+      const dx =
+        a.x - target.x;
+
+      const dy =
+        a.y - target.y;
+
+      const distance =
+        Math.sqrt(
+          dx * dx +
+          dy * dy
+        );
+
+
+      /*
+       * acertou
+       */
+
+      if (distance <= 55) {
+
+        let points = 10;
+
+        if (distance <= 14) {
+
+          points = 50;
+
+          message(
+            "🎯 BULLSEYE! +50"
+          );
+
+        } else if (distance <= 28) {
+
+          points = 30;
+
+          message(
+            "🔥 ÓTIMO! +30"
+          );
+
+        } else {
+
+          points = 10;
+
+          message(
+            "🏹 HIT! +10"
+          );
+        }
+
+
+        score += points;
+
+        hitEffects.push({
+          x: a.x,
+          y: a.y,
+          life: 0
+        });
+
+
+        flyingArrows.splice(i, 1);
+
+        updateHUD();
+
+        continue;
+      }
+
+
+      /*
+       * saiu da tela
+       */
+
+      if (
+        a.x > W + 100 ||
+        a.y > H + 100 ||
+        a.y < -100
+      ) {
+
+        flyingArrows.splice(i, 1);
+
+        message("❌ MISS");
+      }
+    }
+
+
+    /*
+     * atualizar efeitos
+     */
+
+    for (
+      let i = hitEffects.length - 1;
+      i >= 0;
+      i--
+    ) {
+
+      hitEffects[i].life += .035;
+
+      if (
+        hitEffects[i].life >= 1
+      ) {
+
+        hitEffects.splice(i, 1);
+      }
+    }
+  }
+
+
+  /*
+   * ============================
+   * MIRA
+   * ============================
+   */
+
+  function aimLeft() {
+
+    if (gameOver) return;
+
+    angle -= .045;
+
+    angle =
+      clamp(
+        angle,
+        minAngle,
+        maxAngle
+      );
+  }
+
+
+  function aimRight() {
+
+    if (gameOver) return;
+
+    angle += .045;
+
+    angle =
+      clamp(
+        angle,
+        minAngle,
+        maxAngle
+      );
+  }
+
+
+  /*
+   * ============================
+   * CARREGAR
+   * ============================
+   */
+
+  function startCharge(e) {
+
+    if (e) e.preventDefault();
+
+    if (gameOver) return;
+
+    if (shots <= 0) return;
+
+    if (charging) return;
+
+    charging = true;
+
+    power = 0;
+
+    chargeStart =
+      performance.now();
+  }
+
+
+  function updateCharge() {
+
+    if (!charging) return;
+
+    const elapsed =
+      performance.now() -
+      chargeStart;
+
+
+    power =
+      Math.min(
+        elapsed / 900,
+        1
+      );
+
+
+    if (power >= 1) {
+
+      power = 1;
+    }
+  }
+
+
+  function releaseCharge(e) {
+
+    if (e) e.preventDefault();
+
+    if (!charging) return;
+
+    charging = false;
+
+    shoot();
+
+    power = 0;
+
+    updateHUD();
+  }
+
+
+  /*
+   * ============================
+   * NOVO JOGO
+   * ============================
+   */
+
+  function restart() {
+
+    score = 0;
+
+    shots = 10;
+
+    angle = -0.18;
+
+    power = 0;
+
+    charging = false;
+
+    gameOver = false;
+
+    flyingArrows = [];
+
+    hitEffects = [];
+
+    message("");
+
+    updateHUD();
+  }
+
+
+  /*
+   * ============================
+   * BOTÕES
+   * ============================
+   */
+
+  leftButton.addEventListener(
+    "click",
+    function (e) {
+
+      e.preventDefault();
+
+      aimLeft();
+    }
+  );
+
+
+  rightButton.addEventListener(
+    "click",
+    function (e) {
+
+      e.preventDefault();
+
+      aimRight();
+
+    }
+  );
+
+  shootButton.addEventListener(
+    "mousedown",
+    startCharge
+  );
+
+  window.addEventListener(
+    "mouseup",
+    releaseCharge
+  );
+
+  shootButton.addEventListener(
+    "touchstart",
+    startCharge,
+    { passive: false }
+  );
+
+  shootButton.addEventListener(
+    "touchend",
+    releaseCharge,
+    { passive: false }
+  );
+
+  shootButton.addEventListener(
+    "touchcancel",
+    releaseCharge,
+    { passive: false }
+  );
+
+  shootButton.addEventListener(
+    "pointerdown",
+    startCharge
+  );
+
+  shootButton.addEventListener(
+    "pointerup",
+    releaseCharge
+  );
+
+  shootButton.addEventListener(
+    "pointercancel",
+    releaseCharge
+  );
+
+  restartButton.addEventListener(
+    "click",
+    restart
+  );
+
+  function gameLoop() {
+
+    updateCharge();
+
+    updateArrows();
+
+    ctx.clearRect(
+      0,
+      0,
+      W,
+      H
+    );
+
+    drawBackground();
+
+    drawTrajectory();
+
+    drawTarget();
+
+    drawBow();
+
+    flyingArrows.forEach(
+      drawArrow
+    );
+
+    drawHitEffects();
+
+    requestAnimationFrame(
+      gameLoop
+    );
+  }
+
+  updateHUD();
+
+  gameLoop();
+
+})();
+</script>
+<a class="voltar" href="../" target="_top">← Catálogo</a><script>if(window.top!==window.self){var v=document.querySelector(".voltar");if(v)v.style.display="none"}</script></html>

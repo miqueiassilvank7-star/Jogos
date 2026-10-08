@@ -1,0 +1,765 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Forca</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head><!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<style>
+
+:root{
+  --accent-a:#8b6cf0;
+  --accent-b:#4fa8e0;
+  --ink:#f2f5f7;
+  --ink-dim:rgba(242,245,247,.55);
+  --ink-faint:rgba(242,245,247,.4);
+}
+*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-sizing:border-box}
+body{margin:0;background:transparent;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);touch-action:manipulation}
+.wrap{width:100%;max-width:620px;margin:auto;padding:16px}
+.card{background:linear-gradient(180deg,rgba(34,45,53,.97),rgba(24,33,40,.97));border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.head{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent-b);opacity:.85}
+.title{font-size:16px;font-weight:800;color:#fff;letter-spacing:.3px;margin-top:2px}
+.stats{display:flex;gap:16px;text-align:right}
+.value{font:800 17px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff;font-variant-numeric:tabular-nums}
+.label{font-size:8px;font-weight:700;color:var(--ink-faint);letter-spacing:1.2px;margin-bottom:3px}
+.main{padding:16px}
+.board{position:relative;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.05),rgba(0,0,0,0) 60%),rgba(4,9,12,.4);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:inset 0 0 24px rgba(0,0,0,.35)}
+.board canvas{display:block;width:100%;height:auto}
+.controls{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.button{min-height:46px;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;font-weight:700;font-size:12px;letter-spacing:.3px;background:rgba(255,255,255,.06);padding:0 16px;transition:transform .08s ease,filter .08s ease}
+.button:active{transform:scale(.94);filter:brightness(1.15)}
+.primary{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));border-color:rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(139,108,240,.35)}
+.status{text-align:center;font:10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink-faint);letter-spacing:.3px;margin-top:12px;min-height:12px}
+.overlay{position:absolute;inset:0;background:rgba(10,15,19,.88);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:5;animation:fade-in .18s ease}
+.overlay.hidden{display:none}
+.overlay-title{font-size:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,#fff,var(--accent-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.overlay-sub{font-size:11px;color:var(--ink-dim);letter-spacing:.2px;margin-top:8px;max-width:280px}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #0a0b14;
+  color: white;
+  font-family: "Courier New", ui-monospace, monospace;
+  overflow-x: hidden;
+}
+
+.forca-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+}
+
+.forca-card {
+  width: min(560px, 100%);
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(124,92,255,.16), transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(45,212,255,.10), transparent 50%),
+    linear-gradient(155deg, #0d0e1c, #131427 55%, #0c0d1a);
+  border: 1px solid rgba(124,92,255,.35);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4),
+    0 20px 50px rgba(0,0,0,.55),
+    0 0 30px rgba(124,92,255,.12);
+}
+
+.forca-header {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(124,92,255,.25);
+  background: linear-gradient(90deg, rgba(124,92,255,.10), transparent 60%);
+}
+
+.game-name {
+  color: #f2f1ff;
+  font-weight: 700;
+  font-size: clamp(13px, 3.2vw, 19px);
+  letter-spacing: .5px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-name::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #2dd4ff;
+  box-shadow: 0 0 10px #2dd4ff, 0 0 20px rgba(45,212,255,.6);
+  flex-shrink: 0;
+}
+
+.tip-box {
+  text-align: right;
+  white-space: nowrap;
+  line-height: 1.35;
+}
+
+.tip-label {
+  display: block;
+  color: #6c72a8;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+
+.tip-value {
+  display: block;
+  color: #2dd4ff;
+  font-weight: 700;
+  font-size: clamp(13px, 3.4vw, 17px);
+}
+
+.forca-main {
+  padding: 20px 18px 16px;
+}
+
+.hangman-box {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 18px;
+  background: #05060c;
+  overflow: hidden;
+  border: 1px solid rgba(124,92,255,.18);
+  box-shadow: inset 0 0 30px rgba(45,60,140,.18);
+}
+
+.hangman-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(124,92,255,.05) 1px, transparent 1px) 0 0 / 100% 28px,
+    linear-gradient(90deg, rgba(124,92,255,.05) 1px, transparent 1px) 0 0 / 28px 100%;
+  pointer-events: none;
+}
+
+.hangman-svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hm-part {
+  opacity: 0;
+  transform-origin: 330px 108px;
+  transform: scale(.6);
+  transition: opacity .3s ease, transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+
+.hm-part.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hm-line {
+  stroke: #8f7bff;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  filter: drop-shadow(0 0 5px rgba(143,123,255,.7));
+}
+
+.hm-body {
+  stroke: #ff5470;
+  stroke-width: 5;
+  stroke-linecap: round;
+  fill: none;
+  filter: drop-shadow(0 0 6px rgba(255,84,112,.65));
+}
+
+.hm-head {
+  stroke: #ff5470;
+  stroke-width: 5;
+  fill: #0a0b14;
+  filter: drop-shadow(0 0 6px rgba(255,84,112,.65));
+}
+
+.word {
+  min-height: 84px;
+  padding: 22px 5px 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: clamp(24px, 6.6vw, 42px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+.word.shake {
+  animation: shake .35s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.word-letter {
+  min-width: 28px;
+  display: inline-block;
+  border-bottom: 3px solid rgba(124,92,255,.4);
+  line-height: 1.15;
+  padding: 0 4px 4px;
+  color: #6c72a8;
+}
+
+.word-letter.filled {
+  color: #f2f1ff;
+  border-bottom-color: #2dd4ff;
+  animation: pop .25s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.word-space {
+  width: 14px;
+}
+
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  max-width: 430px;
+  margin: 6px auto 14px;
+}
+
+.key {
+  height: 52px;
+  border-radius: 10px;
+  border: 1px solid rgba(124,92,255,.3);
+  background: linear-gradient(155deg, #1a1c30, #12131f);
+  color: #eceafd;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 2px 0 rgba(0,0,0,.4), inset 0 0 10px rgba(124,92,255,.08);
+  transition: transform .08s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
+}
+
+.key:hover {
+  border-color: rgba(124,92,255,.6);
+}
+
+.key:active {
+  transform: translateY(2px) scale(.96);
+  box-shadow: 0 0 0 rgba(0,0,0,.4);
+}
+
+.key.used {
+  opacity: .3;
+  pointer-events: none;
+}
+
+.key.correct {
+  border-color: #39ff88;
+  background: linear-gradient(155deg, #123324, #0d2419);
+  color: #7ff5aa;
+  box-shadow: 0 0 12px rgba(57,255,136,.25);
+}
+
+.key.wrong {
+  border-color: #ff5470;
+  background: linear-gradient(155deg, #33121c, #250d15);
+  color: #ff8fa0;
+}
+
+.status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(124,92,255,.2);
+  background: rgba(0,0,0,.25);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+
+.status-item {
+  color: #6c72a8;
+}
+
+.status-item b {
+  color: #f2f1ff;
+  font-size: 16px;
+  margin-left: 5px;
+}
+
+.result {
+  min-height: 0;
+  padding: 0 20px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 16px;
+  overflow: hidden;
+  transition: all .3s ease;
+}
+
+.result.show {
+  min-height: 50px;
+  padding: 14px 20px;
+  animation: fadeUp .3s ease;
+}
+
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.result.win {
+  color: #39ff88;
+}
+
+.result.lose {
+  color: #ff5470;
+}
+
+.new-game {
+  display: none;
+  width: min(240px, 90%);
+  height: 48px;
+  margin: 4px auto 16px;
+  border: 1px solid rgba(45,212,255,.5);
+  border-radius: 12px;
+  background: linear-gradient(155deg, #16324a, #0f2436);
+  color: #d6f4ff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .08s ease;
+}
+
+.new-game:active {
+  transform: scale(.97);
+}
+
+.new-game.show {
+  display: block;
+}
+
+.footer {
+  padding: 10px;
+  text-align: center;
+  color: #454a70;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="forca-wrap">
+  <div class="forca-card">
+
+    <div class="forca-header">
+      <div class="game-name">FORCA BOT</div>
+      <div class="tip-box">
+        <span class="tip-label">DICA</span>
+        <span id="tip" class="tip-value">ANIMAL</span>
+      </div>
+    </div>
+
+    <div class="forca-main">
+
+      <div class="hangman-box">
+        <svg class="hangman-svg"
+             viewBox="0 0 500 320"
+             preserveAspectRatio="xMidYMid meet">
+          <!-- FORCA -->
+          <g class="hm-part show">
+            <line class="hm-line" x1="95" y1="280" x2="300" y2="280"/>
+            <line class="hm-line" x1="145" y1="280" x2="145" y2="45"/>
+            <line class="hm-line" x1="145" y1="45" x2="330" y2="45"/>
+            <line class="hm-line" x1="330" y1="45" x2="330" y2="82"/>
+          </g>
+
+          <!-- CABEÇA -->
+          <g id="part1" class="hm-part">
+            <circle class="hm-head" cx="330" cy="108" r="30"/>
+          </g>
+
+          <!-- CORPO -->
+          <g id="part2" class="hm-part">
+            <line class="hm-body" x1="330" y1="138" x2="330" y2="205"/>
+          </g>
+
+          <!-- BRAÇO ESQUERDO -->
+          <g id="part3" class="hm-part">
+            <line class="hm-body" x1="330" y1="155" x2="282" y2="205"/>
+          </g>
+
+          <!-- BRAÇO DIREITO -->
+          <g id="part4" class="hm-part">
+            <line class="hm-body" x1="330" y1="155" x2="378" y2="205"/>
+          </g>
+
+          <!-- PERNA ESQUERDA -->
+          <g id="part5" class="hm-part">
+            <line class="hm-body" x1="330" y1="205" x2="295" y2="270"/>
+          </g>
+
+          <!-- PERNA DIREITA -->
+          <g id="part6" class="hm-part">
+            <line class="hm-body" x1="330" y1="205" x2="365" y2="270"/>
+          </g>
+        </svg>
+      </div>
+
+      <div id="word" class="word"></div>
+
+      <div id="keyboard" class="keyboard"></div>
+
+      <div id="result" class="result"></div>
+
+      <button id="newGame" class="new-game">
+        🔄 NOVA PARTIDA
+      </button>
+
+    </div>
+
+    <div class="status">
+      <div class="status-item">ERROS<b id="errors">0</b>/6</div>
+      <div class="status-item">PONTOS<b id="score">0</b></div>
+    </div>
+
+    <div class="footer">
+      MSNK7BOT · FORCA
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var words = [
+    { word: "CACHORRO", tip: "ANIMAL" },
+    { word: "GATO", tip: "ANIMAL" },
+    { word: "ELEFANTE", tip: "ANIMAL" },
+    { word: "GIRAFA", tip: "ANIMAL" },
+    { word: "MACACO", tip: "ANIMAL" },
+    { word: "TUBARAO", tip: "ANIMAL" },
+    { word: "LEAO", tip: "ANIMAL" },
+    { word: "TIGRE", tip: "ANIMAL" },
+    { word: "COELHO", tip: "ANIMAL" },
+    { word: "CAVALO", tip: "ANIMAL" },
+    { word: "BORBOLETA", tip: "ANIMAL" },
+    { word: "PAPAGAIO", tip: "ANIMAL" },
+
+    { word: "FUTEBOL", tip: "ESPORTE" },
+    { word: "BASQUETE", tip: "ESPORTE" },
+    { word: "NATACAO", tip: "ESPORTE" },
+    { word: "TENIS", tip: "ESPORTE" },
+    { word: "VOLEI", tip: "ESPORTE" },
+
+    { word: "COMPUTADOR", tip: "TECNOLOGIA" },
+    { word: "CELULAR", tip: "TECNOLOGIA" },
+    { word: "INTERNET", tip: "TECNOLOGIA" },
+    { word: "TECLADO", tip: "TECNOLOGIA" },
+    { word: "MONITOR", tip: "TECNOLOGIA" },
+
+    { word: "PIZZA", tip: "COMIDA" },
+    { word: "HAMBURGUER", tip: "COMIDA" },
+    { word: "CHOCOLATE", tip: "COMIDA" },
+    { word: "LASANHA", tip: "COMIDA" },
+    { word: "SORVETE", tip: "COMIDA" },
+
+    { word: "BRASIL", tip: "PAIS" },
+    { word: "ARGENTINA", tip: "PAIS" },
+    { word: "JAPAO", tip: "PAIS" },
+    { word: "FRANCA", tip: "PAIS" },
+    { word: "CANADA", tip: "PAIS" },
+
+    { word: "MUSICA", tip: "ARTE" },
+    { word: "CINEMA", tip: "ARTE" },
+    { word: "TEATRO", tip: "ARTE" },
+    { word: "DESENHO", tip: "ARTE" },
+
+    { word: "ESCOLA", tip: "LUGAR" },
+    { word: "HOSPITAL", tip: "LUGAR" },
+    { word: "PRAIA", tip: "LUGAR" },
+    { word: "PARQUE", tip: "LUGAR" },
+    { word: "AEROPORTO", tip: "LUGAR" }
+  ];
+
+  var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+  var current = null;
+  var guessed = [];
+  var errors = 0;
+  var score = 0;
+  var finished = false;
+
+  var wordEl = document.getElementById("word");
+  var tipEl = document.getElementById("tip");
+  var keyboardEl = document.getElementById("keyboard");
+  var errorsEl = document.getElementById("errors");
+  var scoreEl = document.getElementById("score");
+  var resultEl = document.getElementById("result");
+  var newGameEl = document.getElementById("newGame");
+
+  function randomWord() {
+    return words[Math.floor(Math.random() * words.length)];
+  }
+
+  function normalize(text) {
+    return text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function renderWord() {
+    wordEl.innerHTML = "";
+
+    var cleanWord = normalize(current.word);
+
+    for (var i = 0; i < current.word.length; i++) {
+      var original = current.word[i];
+      var clean = cleanWord[i];
+
+      if (original === " ") {
+        var space = document.createElement("span");
+        space.className = "word-space";
+        wordEl.appendChild(space);
+        continue;
+      }
+
+      var span = document.createElement("span");
+      span.className = "word-letter";
+
+      if (guessed.indexOf(clean) !== -1) {
+        span.textContent = original;
+        span.classList.add("filled");
+      } else {
+        span.textContent = "_";
+      }
+
+      wordEl.appendChild(span);
+    }
+  }
+
+  function renderKeyboard() {
+    keyboardEl.innerHTML = "";
+
+    letters.forEach(function (letter) {
+      var button = document.createElement("button");
+
+      button.className = "key";
+      button.textContent = letter;
+      button.setAttribute("data-letter", letter);
+
+      if (guessed.indexOf(letter) !== -1) {
+        button.classList.add("used");
+
+        if (normalize(current.word).indexOf(letter) !== -1) {
+          button.classList.add("correct");
+        } else {
+          button.classList.add("wrong");
+        }
+      }
+
+      keyboardEl.appendChild(button);
+    });
+  }
+
+  function updateHangman() {
+    for (var i = 1; i <= 6; i++) {
+      var part = document.getElementById("part" + i);
+
+      if (part) {
+        if (errors >= i) {
+          part.classList.add("show");
+        } else {
+          part.classList.remove("show");
+        }
+      }
+    }
+  }
+
+  function updateStatus() {
+    errorsEl.textContent = String(errors);
+    scoreEl.textContent = String(score);
+  }
+
+  function isComplete() {
+    var cleanWord = normalize(current.word);
+
+    for (var i = 0; i < cleanWord.length; i++) {
+      if (cleanWord[i] !== " " &&
+          guessed.indexOf(cleanWord[i]) === -1) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function finishWin() {
+    finished = true;
+
+    var bonus = Math.max(10, 60 - (errors * 10));
+    score += bonus;
+
+    resultEl.textContent =
+      "🎉 PARABÉNS! Você acertou! +" + bonus + " pontos";
+
+    resultEl.className = "result show win";
+
+    newGameEl.classList.add("show");
+
+    updateStatus();
+  }
+
+  function finishLose() {
+    finished = true;
+
+    resultEl.textContent =
+      "💀 FIM DE JOGO! A palavra era: " + current.word;
+
+    resultEl.className = "result show lose";
+
+    newGameEl.classList.add("show");
+
+    renderWord();
+  }
+
+  function chooseLetter(letter) {
+    if (finished) return;
+    if (guessed.indexOf(letter) !== -1) return;
+
+    guessed.push(letter);
+
+    var cleanWord = normalize(current.word);
+
+    if (cleanWord.indexOf(letter) === -1) {
+      errors++;
+
+      updateHangman();
+
+      wordEl.classList.remove("shake");
+      void wordEl.offsetWidth;
+      wordEl.classList.add("shake");
+
+      if (errors >= 6) {
+        renderKeyboard();
+        updateStatus();
+        finishLose();
+        return;
+      }
+    }
+
+    renderWord();
+    renderKeyboard();
+    updateStatus();
+
+    if (isComplete()) {
+      finishWin();
+    }
+  }
+
+  function startGame() {
+    current = randomWord();
+    guessed = [];
+    errors = 0;
+    finished = false;
+
+    tipEl.textContent = current.tip;
+
+    resultEl.textContent = "";
+    resultEl.className = "result";
+
+    newGameEl.classList.remove("show");
+
+    updateHangman();
+    renderWord();
+    renderKeyboard();
+    updateStatus();
+  }
+
+  keyboardEl.addEventListener("pointerdown", function (event) {
+    var button = event.target.closest(".key");
+
+    if (!button) return;
+
+    event.preventDefault();
+
+    var letter = button.getAttribute("data-letter");
+
+    if (letter) {
+      chooseLetter(letter);
+    }
+  });
+
+  keyboardEl.addEventListener("click", function (event) {
+    var button = event.target.closest(".key");
+
+    if (!button) return;
+
+    var letter = button.getAttribute("data-letter");
+
+    if (letter) {
+      chooseLetter(letter);
+    }
+  });
+
+  newGameEl.addEventListener("pointerdown", function (event) {
+    event.preventDefault();
+    startGame();
+  });
+
+  newGameEl.addEventListener("click", function () {
+    startGame();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    var letter = String(event.key || "").toUpperCase();
+
+    if (/^[A-Z]$/.test(letter)) {
+      chooseLetter(letter);
+    }
+
+    if (event.key === "Enter" && finished) {
+      startGame();
+    }
+  });
+
+  startGame();
+
+})();
+</script>
+</body>
+</html><a class="voltar" href="../" target="_top">← Catálogo</a><script>if(window.top!==window.self){var v=document.querySelector(".voltar");if(v)v.style.display="none"}</script></html>
