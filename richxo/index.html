@@ -44,4 +44,4 @@ function aiMove(){if(over)return;let pick=null;for(const who of ['O','X'])for(co
 function reset(){board=Array(9).fill('');turn='X';over=false;overlay.classList.add('hidden');statusEl.textContent=mode==='ai'?'SUA VEZ • JOGUE COM X':'VEZ DO JOGADOR X';render()}
 function setMode(next){mode=next;document.getElementById('ai').classList.toggle('active',mode==='ai');document.getElementById('pvp').classList.toggle('active',mode==='pvp');reset()}
 document.getElementById('ai').addEventListener('pointerdown',()=>setMode('ai'));document.getElementById('pvp').addEventListener('pointerdown',()=>setMode('pvp'));document.getElementById('reset').addEventListener('pointerdown',reset);reset();
-</script></body><a class="voltar" href="../">← Catálogo</a></html>
+</script></body><a class="voltar" href="../" target="_top">← Catálogo</a><script>if(window.top!==window.self){var v=document.querySelector(".voltar");if(v)v.style.display="none"}</script></html>
