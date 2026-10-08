@@ -1,0 +1,141 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Cacapalavras</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head><!DOCTYPE html>
+<html lang="pt-br"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caça-Palavras</title>
+<style>
+html,body{background:#fff!important;color:#000!important;margin:0;min-height:100vh;font-family:Arial,sans-serif;text-align:center}
+h1{font-size:20px;margin:10px 0 2px}
+#info{font-size:14px;margin:4px 0}
+table{border-collapse:collapse;margin:8px auto;user-select:none;-webkit-user-select:none}
+td{width:var(--cell);height:var(--cell);border:1px solid #000;text-align:center;cursor:pointer;font-size:calc(var(--cell)*.55);padding:0;color:#000;background:#fff}
+td.highlight{background:#eca6e1}
+td.found{background:lightgreen}
+#words{margin:8px}
+.word{display:inline-block;margin:3px 6px;font-size:14px}
+.found-word{text-decoration:line-through;color:green}
+#msg{position:fixed;left:0;right:0;top:35%;margin:auto;width:80%;max-width:320px;padding:16px;background:#fff;border:2px solid green;border-radius:12px;font-size:20px;display:none;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+button{font-size:16px;padding:8px 16px;margin-top:8px}
+</style></head><body>
+<h1>🔎 Caça-Palavras</h1>
+<div id="info"></div>
+<table id="grid"></table>
+<div id="words"></div>
+<div id="msg"></div>
+<script>
+const WORDS="DECORATIVOS RELIGIOSOS LÚDICOS ARTEPOPULAR TRADICIONAL ADORNOS INDÍGENA QUILOMBOLA SUVENIRES ARTESANATO CERÂMICA CULTURA FOLCLORE TECELAGEM BORDADO CESTARIA MADEIRA ENTALHE RENDA BARRO PALHA MOSAICO IDENTIDADE HERANÇA RAÍZES COLORIDO ORIGINAL RIBEIRINHO TAPEÇARIA XILOGRAVURA LENDAS FESTAS MÁSCARAS BONECAS ESCULTURA PINTURA CROCHÊ TRICÔ COSTURA ARGILA ONÇA TARTARUGA JACARÉ ARARA TUCANO BORBOLETA GOLFINHO ELEFANTE GIRAFA CAVALO COELHO PAPAGAIO SERPENTE CAMALEÃO PINGUIM BALEIA TUBARÃO CARANGUEJO ESQUILO MACACO PREGUIÇA CAPIVARA LOBO RAPOSA CORUJA BEIJAFLOR ANDORINHA GAVIÃO FORMIGA ABELHA LIBÉLULA GAFANHOTO CIGARRA ARANHA ESCORPIÃO CROCODILO HIPOPÓTAMO RINOCERONTE CANGURU TAMANDUÁ ABACAXI MELANCIA MORANGO GOIABA MANGA LARANJA BANANA MARACUJÁ JABUTICABA PITANGA CAJU GRAVIOLA CUPUAÇU AÇAÍ MANDIOCA FEIJOADA BRIGADEIRO PAMONHA TAPIOCA COXINHA PASTEL PIPOCA QUINDIM CANJICA BEIJINHO ACARAJÉ MOQUECA CHURRASCO MACARRÃO LASANHA CHOCOLATE SORVETE BISCOITO PUDIM GELEIA AMENDOIM CASTANHA COCADA PAÇOCA ROSQUINHA MONTANHA CACHOEIRA FLORESTA PANTANAL AMAZÔNIA CERRADO CAATINGA PRAIA VULCÃO DESERTO PLANÍCIE PENÍNSULA ARQUIPÉLAGO LAGOA RIACHO CAVERNA GEOGRAFIA OCEANO ILHA CAMPO PETECA FUTEBOL VOLEIBOL BASQUETE NATAÇÃO CICLISMO CORRIDA CAPOEIRA PIÃO BOLINHA AMARELINHA BRINCADEIRA GANGORRA ESCORREGADOR BALANÇO CIRANDA PIPA BAMBOLÊ XADREZ DAMAS DOMINÓ BARALHO QUEBRACABEÇA LABIRINTO TABULEIRO GINÁSTICA ATLETISMO SKATE PATINS BOLICHE PROFESSOR MÉDICO ENGENHEIRO PADEIRO BOMBEIRO PESCADOR AGRICULTOR MÚSICO PINTOR ESCULTOR CANTOR DANÇARINO ATOR POETA ESCRITOR CIENTISTA ASTRONAUTA MOTORISTA CARPINTEIRO COZINHEIRO JARDINEIRO VETERINÁRIO DENTISTA ADVOGADO JORNALISTA ELETRICISTA PEDREIRO COSTUREIRA BIBLIOTECA COMPUTADOR".split(" ");
+const POOL=[...new Set(WORDS)];
+const SIZE=16, PER=10, TOTAL=Math.floor(POOL.length/PER);
+let phase=1, grid, placements, words, size, sel=[], busy=false, ORDER=[];
+const $=id=>document.getElementById(id);
+const rand=n=>Math.floor(Math.random()*n);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function reshuffle(){ORDER=shuffle(POOL.slice());}
+
+function place(){
+  grid=Array.from({length:size},()=>Array(size).fill(''));
+  placements=[];
+  for(const word of words){
+    let ok=false;
+    for(let a=0;a<300&&!ok;a++){
+      const v=Math.random()<.5,r0=rand(size),c0=rand(size),sr=v?1:0,sc=v?0:1;
+      let fits=true;
+      for(let i=0;i<word.length;i++){
+        const r=r0+i*sr,c=c0+i*sc;
+        if(r>=size||c>=size||(grid[r][c]!==''&&grid[r][c]!==word[i])){fits=false;break;}
+      }
+      if(fits){
+        for(let i=0;i<word.length;i++)grid[r0+i*sr][c0+i*sc]=word[i];
+        placements.push({word,r:r0,c:c0,sr,sc,done:false});
+        ok=true;
+      }
+    }
+    if(!ok)return false;
+  }
+  return true;
+}
+
+function newPhase(){
+  size=SIZE;
+  words=ORDER.slice((phase-1)*PER,phase*PER);
+  for(let t=0;t<200&&!place();t++){}
+  for(let r=0;r<size;r++)for(let c=0;c<size;c++)
+    if(grid[r][c]==='')grid[r][c]=String.fromCharCode(65+rand(26));
+  const w=window.innerWidth>0?window.innerWidth:360;
+  const cell=Math.max(16,Math.min(30,Math.floor((w-16)/size)));
+  const t=$('grid');
+  t.style.setProperty('--cell',cell+'px');
+  t.innerHTML='';
+  grid.forEach((row,r)=>{
+    const tr=document.createElement('tr');
+    row.forEach((ch,c)=>{
+      const td=document.createElement('td');
+      td.textContent=ch;td.dataset.row=r;td.dataset.col=c;
+      tr.appendChild(td);
+    });
+    t.appendChild(tr);
+  });
+  $('words').innerHTML='';
+  words.forEach((wd,i)=>{
+    const p=document.createElement('span');
+    p.className='word';p.id='w'+i;p.textContent=wd;
+    $('words').appendChild(p);
+  });
+  sel=[];busy=false;
+  updateInfo();
+}
+
+function updateInfo(){
+  const n=placements.filter(p=>p.done).length;
+  $('info').textContent='Fase '+phase+'/'+TOTAL+' • '+n+'/'+placements.length+' palavras';
+}
+
+function markFound(p){
+  if(p.done)return;
+  p.done=true;
+  for(let i=0;i<p.word.length;i++){
+    const cell=document.querySelector('#grid td[data-row="'+(p.r+i*p.sr)+'"][data-col="'+(p.c+i*p.sc)+'"]');
+    if(cell)cell.classList.add('found');
+  }
+  $('w'+words.indexOf(p.word)).classList.add('found-word');
+  updateInfo();
+  if(placements.every(x=>x.done))complete();
+}
+
+function complete(){
+  if(busy)return;busy=true;
+  const m=$('msg');m.style.display='block';
+  if(phase<TOTAL){
+    m.innerHTML='🎉 Fase '+phase+' completa!<br><small>Próxima fase...</small>';
+    setTimeout(()=>{phase++;m.style.display='none';newPhase();},1800);
+  }else{
+    m.innerHTML='🏆 Você zerou as '+TOTAL+' fases!<br><button id="again">Jogar de novo</button>';
+    $('again').onclick=()=>{phase=1;reshuffle();m.style.display='none';newPhase();};
+  }
+}
+
+const g=$('grid');
+g.addEventListener('mousedown',e=>{
+  const td=e.target.closest('td');if(!td||busy)return;
+  sel=[td];td.classList.add('highlight');
+});
+g.addEventListener('mouseover',e=>{
+  const td=e.target.closest('td');
+  if(td&&sel.length&&!sel.includes(td)){sel.push(td);td.classList.add('highlight');}
+});
+document.addEventListener('mouseup',()=>{
+  const txt=sel.map(c=>c.textContent).join('');
+  const p=placements.find(x=>!x.done&&x.word===txt);
+  if(p)markFound(p);
+  sel.forEach(c=>c.classList.remove('highlight'));
+  sel=[];
+});
+g.addEventListener('click',e=>{
+  const td=e.target.closest('td');if(!td||busy)return;
+  const r=+td.dataset.row,c=+td.dataset.col;
+  const p=placements.find(x=>x.r===r&&x.c===c&&!x.done);
+  if(p)markFound(p);
+});
+reshuffle();
+newPhase();
+</script></body></html>
+<a class="voltar" href="../">← Catálogo</a></html>

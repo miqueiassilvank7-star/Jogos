@@ -1,0 +1,2202 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Bounce</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head>
+
+<style>
+
+
+:root{
+  --accent-a:#8b6cf0;
+  --accent-b:#4fa8e0;
+  --ink:#f2f5f7;
+  --ink-dim:rgba(242,245,247,.55);
+  --ink-faint:rgba(242,245,247,.4);
+}
+*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-sizing:border-box}
+body{margin:0;background:transparent;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);touch-action:manipulation}
+.wrap{width:100%;max-width:620px;margin:auto;padding:16px}
+.card{background:linear-gradient(180deg,rgba(34,45,53,.97),rgba(24,33,40,.97));border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.head{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent-b);opacity:.85}
+.title{font-size:16px;font-weight:800;color:#fff;letter-spacing:.3px;margin-top:2px}
+.stats{display:flex;gap:16px;text-align:right}
+.value{font:800 17px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff;font-variant-numeric:tabular-nums}
+.label{font-size:8px;font-weight:700;color:var(--ink-faint);letter-spacing:1.2px;margin-bottom:3px}
+.main{padding:16px}
+.board{position:relative;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.05),rgba(0,0,0,0) 60%),rgba(4,9,12,.4);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:inset 0 0 24px rgba(0,0,0,.35)}
+.board canvas{display:block;width:100%;height:auto}
+.controls{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.button{min-height:46px;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;font-weight:700;font-size:12px;letter-spacing:.3px;background:rgba(255,255,255,.06);padding:0 16px;transition:transform .08s ease,filter .08s ease}
+.button:active{transform:scale(.94);filter:brightness(1.15)}
+.primary{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));border-color:rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(139,108,240,.35)}
+.status{text-align:center;font:10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink-faint);letter-spacing:.3px;margin-top:12px;min-height:12px}
+.overlay{position:absolute;inset:0;background:rgba(10,15,19,.88);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:5;animation:fade-in .18s ease}
+.overlay.hidden{display:none}
+.overlay-title{font-size:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,#fff,var(--accent-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.overlay-sub{font-size:11px;color:var(--ink-dim);letter-spacing:.2px;margin-top:8px;max-width:280px}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+
+
+html,
+body {
+  width: 100%;
+  min-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #07151c;
+}
+
+.wrap {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.head {
+  width: 100% !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+}
+
+.main {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 8px !important;
+}
+
+/* =========================
+   ÁREA DO JOGO
+   ========================= */
+
+#bounce {
+  position: relative;
+  width: 100%;
+  height: min(78vh, 720px);
+  min-height: 500px;
+  overflow: hidden;
+
+  border-radius: 24px;
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(55, 130, 155, 0.25),
+      transparent 55%
+    ),
+    #164052;
+
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.3),
+    0 15px 40px rgba(0, 0, 0, 0.35);
+
+  user-select: none;
+  touch-action: none;
+}
+
+/* =========================
+   FUNDO
+   ========================= */
+
+#bounce::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(255,255,255,.08) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(255,255,255,.06) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 50% 70%,
+      rgba(255,255,255,.05) 0 2px,
+      transparent 3px
+    );
+
+  background-size:
+    130px 130px,
+    170px 170px,
+    210px 210px;
+
+  pointer-events: none;
+}
+
+/* =========================
+   HUD
+   ========================= */
+
+#hud {
+  position: absolute;
+
+  z-index: 30;
+
+  left: 0;
+  right: 0;
+  top: 0;
+
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 18px;
+
+  font-size: 19px;
+  font-weight: 900;
+
+  background:
+    rgba(4, 18, 24, 0.45);
+
+  backdrop-filter: blur(8px);
+}
+
+.hud-left,
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* =========================
+   MUNDO
+   ========================= */
+
+#world {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 3000px;
+  height: 100%;
+
+  transform-origin: 0 0;
+}
+
+/* =========================
+   PLATAFORMAS
+   ========================= */
+
+.platform {
+  position: absolute;
+
+  background:
+    linear-gradient(
+      #66402a,
+      #392116
+    );
+
+  border-top:
+    7px solid #76a93b;
+
+  border-radius:
+    5px 5px 2px 2px;
+
+  box-shadow:
+    inset 0 -8px 0 rgba(0,0,0,.18),
+    0 7px 0 rgba(0,0,0,.20);
+}
+
+/* =========================
+   PLAYER
+   ========================= */
+
+#player {
+  position: absolute;
+
+  width: 46px;
+  height: 46px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 32% 25%,
+      #ffffff 0 4%,
+      #ffaaaa 5% 16%,
+      #ff4545 35%,
+      #f0003d 75%,
+      #a8002d 100%
+    );
+
+  box-shadow:
+    inset -7px -8px 12px rgba(80,0,30,.30),
+    inset 7px 6px 12px rgba(255,255,255,.40),
+    0 8px 15px rgba(0,0,0,.35);
+
+  z-index: 15;
+}
+
+/* =========================
+   MOEDAS
+   ========================= */
+
+.coin {
+  position: absolute;
+
+  width: 27px;
+  height: 27px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #fff6a0,
+      #ffd22e 35%,
+      #d89400 80%
+    );
+
+  border:
+    2px solid #f7b900;
+
+  color: #9b6100;
+
+  font-size: 13px;
+  font-weight: 900;
+
+  box-shadow:
+    0 0 12px rgba(255,204,40,.45);
+
+  z-index: 10;
+
+  animation:
+    coinFloat 1s ease-in-out infinite;
+}
+
+.coin.collected {
+  display: none;
+}
+
+@keyframes coinFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+
+}
+
+/* =========================
+   META
+   ========================= */
+
+.goal {
+  position: absolute;
+
+  width: 42px;
+  height: 85px;
+
+  border-left:
+    5px solid #eeeeee;
+
+  z-index: 8;
+}
+
+.goal::before {
+  content: "🏁";
+
+  position: absolute;
+
+  left: -2px;
+  top: -20px;
+
+  font-size: 36px;
+}
+
+/* =========================
+   MENU DE FASES
+   ========================= */
+
+#phaseMenu {
+  position: absolute;
+
+  z-index: 50;
+
+  inset: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(38,96,115,.96),
+      rgba(8,28,36,.99)
+    );
+
+  text-align: center;
+}
+
+.menu-ball {
+  font-size: 72px;
+
+  filter:
+    drop-shadow(
+      0 12px 15px
+      rgba(0,0,0,.35)
+    );
+
+  animation:
+    bounceBall 1.5s ease-in-out infinite;
+}
+
+@keyframes bounceBall {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-18px);
+  }
+
+}
+
+#phaseMenu h1 {
+  margin: 4px 0;
+
+  font-size:
+    clamp(42px, 9vw, 76px);
+
+  line-height: 1;
+
+  font-weight: 900;
+
+  color: #ffffff;
+}
+
+.menu-subtitle {
+  margin-bottom: 28px;
+
+  font-size: 20px;
+  font-weight: 800;
+
+  opacity: .80;
+}
+
+.phase-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(55px, 1fr));
+
+  gap: 10px;
+
+  width:
+    min(95%, 650px);
+}
+
+.phase-btn {
+  border: 0;
+
+  min-height: 62px;
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.10);
+
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255,255,255,.10);
+
+  transition:
+    transform .15s,
+    background .15s;
+}
+
+.phase-btn:active {
+  transform: scale(.94);
+}
+
+.phase-btn:hover {
+  background:
+    rgba(255,255,255,.20);
+}
+
+.phase-btn.selected {
+  background:
+    rgba(255,255,255,.25);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(255,255,255,.65),
+    0 8px 20px
+    rgba(0,0,0,.25);
+}
+
+.phase-btn small {
+  display: block;
+
+  margin-top: 3px;
+
+  font-size: 9px;
+
+  opacity: .65;
+}
+
+/* =========================
+   CONTROLES
+   ========================= */
+
+#controls {
+  position: absolute;
+
+  z-index: 40;
+
+  left: 0;
+  right: 0;
+  bottom: 15px;
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 18px;
+
+  pointer-events: auto;
+}
+
+.game-control {
+  width: 62px;
+  height: 52px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.18);
+
+  border-radius: 12px;
+
+  background:
+    rgba(255,255,255,.90);
+
+  color: #111111;
+
+  font-size: 24px;
+
+  font-weight: 900;
+
+  box-shadow:
+    0 5px 12px
+    rgba(0,0,0,.25);
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color:
+    transparent;
+}
+
+.game-control:active {
+  transform:
+    translateY(3px);
+}
+
+/* =========================
+   MENSAGEM
+   ========================= */
+
+#message {
+  position: absolute;
+
+  z-index: 60;
+
+  inset: 0;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(0,0,0,.65);
+
+  backdrop-filter: blur(5px);
+}
+
+.message-box {
+  width:
+    min(88%, 440px);
+
+  padding: 30px;
+
+  border-radius: 24px;
+
+  background:
+    #173d4c;
+
+  text-align: center;
+
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,.5);
+}
+
+.message-box h2 {
+  margin:
+    0 0 10px;
+
+  font-size: 36px;
+}
+
+.message-box p {
+  margin:
+    8px 0 22px;
+
+  font-size: 18px;
+
+  opacity: .80;
+}
+
+.restart {
+  border: 0;
+
+  padding:
+    14px 25px;
+
+  border-radius: 12px;
+
+  background:
+    #ffffff;
+
+  color:
+    #173d4c;
+
+  font-size: 17px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+/* =========================
+   CELULAR
+   ========================= */
+
+@media (max-width: 600px) {
+
+  #bounce {
+    height: 76vh;
+    min-height: 500px;
+    border-radius: 18px;
+  }
+
+  #hud {
+    font-size: 16px;
+    padding: 11px 13px;
+  }
+
+  .hud-left,
+  .hud-right {
+    gap: 8px;
+  }
+
+  .phase-list {
+    grid-template-columns:
+      repeat(3, 1fr);
+
+    width: 88%;
+  }
+
+  .phase-btn {
+    min-height: 58px;
+  }
+
+  .menu-ball {
+    font-size: 62px;
+  }
+
+  #phaseMenu h1 {
+    font-size: 50px;
+  }
+
+}
+
+</style>
+
+
+<div class="wrap">
+
+  <div class="head">
+
+    <div>
+
+      <div style="
+        font-size:14px;
+        font-weight:800;
+        opacity:.65;
+        letter-spacing:1px;
+      ">
+        MSNK7BOT
+      </div>
+
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:8px;
+      ">
+
+        <span style="
+          font-size:32px;
+        ">🔴</span>
+
+        <strong style="
+          font-size:28px;
+          font-weight:900;
+        ">
+          BOUNCE
+        </strong>
+
+      </div>
+
+    </div>
+
+    <div style="
+      font-size:20px;
+      font-weight:900;
+    ">
+      FASE
+      <span id="headerPhase">1</span>
+    </div>
+
+  </div>
+
+
+  <div class="main">
+
+    <div id="bounce">
+
+      <div id="hud">
+
+        <div class="hud-left">
+
+          <span>
+            🪙
+            <span id="coinCount">0</span>/<span id="coinTotal">0</span>
+          </span>
+
+          <span>
+            ❤️
+            <span id="lifeCount">3</span>
+          </span>
+
+        </div>
+
+        <div class="hud-right">
+
+          <span id="phaseHud">
+            FASE 1
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div id="world">
+
+        <div id="player"></div>
+
+      </div>
+
+
+      <div id="controls">
+
+        <button
+          class="game-control"
+          id="left"
+          type="button"
+        >
+          ◀
+        </button>
+
+        <button
+          class="game-control"
+          id="jump"
+          type="button"
+        >
+          ▲
+        </button>
+
+        <button
+          class="game-control"
+          id="right"
+          type="button"
+        >
+          ▶
+        </button>
+
+      </div>
+
+
+      <div id="phaseMenu">
+
+        <div class="menu-ball">
+          🔴
+        </div>
+
+        <h1>
+          BOUNCE
+        </h1>
+
+        <div class="menu-subtitle">
+          ESCOLHA UMA FASE
+        </div>
+
+        <div
+          class="phase-list"
+          id="phaseList"
+        ></div>
+
+      </div>
+
+
+      <div id="message">
+
+        <div class="message-box">
+
+          <h2 id="messageTitle">
+            FIM DE JOGO
+          </h2>
+
+          <p id="messageText">
+            Você perdeu todas as vidas.
+          </p>
+
+          <button
+            class="restart"
+            id="restart"
+            type="button"
+          >
+            🔄 JOGAR NOVAMENTE
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+(() => {
+
+  /* =========================
+     FASES
+     ========================= */
+
+  const levels = [
+
+    {
+      name: "PRIMEIRO SALTO",
+
+      width: 1800,
+
+      spawn: {
+        x: 100,
+        y: 350
+      },
+
+      platforms: [
+
+        [0, 450, 1800, 90],
+
+        [250, 360, 190, 25],
+
+        [540, 300, 180, 25],
+
+        [820, 390, 220, 25],
+
+        [1120, 320, 180, 25],
+
+        [1400, 380, 220, 25]
+
+      ],
+
+      coins: [
+
+        [320, 320],
+
+        [610, 260],
+
+        [900, 350],
+
+        [1180, 280],
+
+        [1470, 340]
+
+      ],
+
+      goal: 1660
+    },
+
+
+    {
+      name: "FLORESTA",
+
+      width: 2200,
+
+      spawn: {
+        x: 100,
+        y: 350
+      },
+
+      platforms: [
+
+        [0, 450, 2200, 90],
+
+        [200, 370, 160, 25],
+
+        [460, 310, 170, 25],
+
+        [740, 380, 150, 25],
+
+        [1000, 290, 200, 25],
+
+        [1310, 350, 180, 25],
+
+        [1580, 280, 190, 25],
+
+        [1880, 370, 190, 25]
+
+      ],
+
+      coins: [
+
+        [250, 330],
+
+        [520, 270],
+
+        [790, 340],
+
+        [1060, 250],
+
+        [1370, 310],
+
+        [1640, 240],
+
+        [1940, 330]
+
+      ],
+
+      goal: 2080
+    },
+
+
+    {
+      name: "CAVERNA",
+
+      width: 2400,
+
+      spawn: {
+        x: 100,
+        y: 350
+      },
+
+      platforms: [
+
+        [0, 450, 2400, 90],
+
+        [230, 350, 150, 25],
+
+        [480, 270, 150, 25],
+
+        [730, 360, 170, 25],
+
+        [1010, 250, 170, 25],
+
+        [1280, 340, 160, 25],
+
+        [1530, 270, 190, 25],
+
+        [1830, 350, 150, 25],
+
+        [2080, 250, 180, 25]
+
+      ],
+
+      coins: [
+
+        [280, 310],
+
+        [530, 230],
+
+        [790, 320],
+
+        [1070, 210],
+
+        [1330, 300],
+
+        [1590, 230],
+
+        [1880, 310],
+
+        [2130, 210]
+
+      ],
+
+      goal: 2280
+    },
+
+
+    {
+      name: "MONTANHA",
+
+      width: 2600,
+
+      spawn: {
+        x: 100,
+        y: 350
+      },
+
+      platforms: [
+
+        [0, 450, 2600, 90],
+
+        [250, 330, 160, 25],
+
+        [520, 250, 150, 25],
+
+        [780, 340, 170, 25],
+
+        [1060, 230, 170, 25],
+
+        [1350, 320, 160, 25],
+
+        [1620, 220, 180, 25],
+
+        [1900, 310, 170, 25],
+
+        [2180, 210, 180, 25]
+
+      ],
+
+      coins: [
+
+        [300, 290],
+
+        [570, 210],
+
+        [840, 300],
+
+        [1110, 190],
+
+        [1400, 280],
+
+        [1680, 180],
+
+        [1960, 270],
+
+        [2240, 170]
+
+      ],
+
+      goal: 2470
+    },
+
+
+    {
+      name: "CASTELO",
+
+      width: 2800,
+
+      spawn: {
+        x: 100,
+        y: 350
+      },
+
+      platforms: [
+
+        [0, 450, 2800, 90],
+
+        [220, 350, 150, 25],
+
+        [470, 270, 160, 25],
+
+        [740, 360, 150, 25],
+
+        [1000, 250, 180, 25],
+
+        [1290, 330, 160, 25],
+
+        [1560, 240, 180, 25],
+
+        [1850, 340, 160, 25],
+
+        [2130, 250, 180, 25],
+
+        [2410, 330, 170, 25],
+
+        [2630, 220, 130, 25]
+
+      ],
+
+      coins: [
+
+        [270, 310],
+
+        [520, 230],
+
+        [790, 320],
+
+        [1060, 210],
+
+        [1350, 290],
+
+        [1620, 200],
+
+        [1910, 300],
+
+        [2190, 210],
+
+        [2470, 290],
+
+        [2670, 180]
+
+      ],
+
+      goal: 2730
+    }
+
+  ];
+
+
+  /* =========================
+     ELEMENTOS
+     ========================= */
+
+  const game =
+    document.getElementById("bounce");
+
+  const world =
+    document.getElementById("world");
+
+  const player =
+    document.getElementById("player");
+
+  const phaseMenu =
+    document.getElementById("phaseMenu");
+
+  const phaseList =
+    document.getElementById("phaseList");
+
+  const message =
+    document.getElementById("message");
+
+  const messageTitle =
+    document.getElementById("messageTitle");
+
+  const messageText =
+    document.getElementById("messageText");
+
+  const restart =
+    document.getElementById("restart");
+
+  const coinCount =
+    document.getElementById("coinCount");
+
+  const coinTotal =
+    document.getElementById("coinTotal");
+
+  const lifeCount =
+    document.getElementById("lifeCount");
+
+  const phaseHud =
+    document.getElementById("phaseHud");
+
+  const headerPhase =
+    document.getElementById("headerPhase");
+
+
+  /* =========================
+     ESTADO
+     ========================= */
+
+  let currentLevel = 0;
+
+  let level = null;
+
+  let platforms = [];
+
+  let coins = [];
+
+  let goal = null;
+
+  let lives = 3;
+
+  let collected = 0;
+
+  let playing = false;
+
+  let animation = null;
+
+  let lastTime = 0;
+
+  let cameraX = 0;
+
+  let finishedLevel = false;
+
+
+  const keys = {
+    left: false,
+    right: false
+  };
+
+
+  /* =========================
+     FÍSICA
+     ========================= */
+
+  const physics = {
+
+    x: 0,
+    y: 0,
+
+    vx: 0,
+    vy: 0,
+
+    width: 46,
+    height: 46,
+
+    acceleration: 0.65,
+
+    maxSpeed: 7,
+
+    jumpPower: -12.5,
+
+    gravity: 0.55,
+
+    grounded: false
+
+  };
+
+
+  /* =========================
+     MENU
+     ========================= */
+
+  function createPhaseMenu() {
+
+    phaseList.innerHTML = "";
+
+    levels.forEach(
+      (item, index) => {
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+        button.type = "button";
+
+        button.className =
+          "phase-btn";
+
+        if (
+          index === currentLevel
+        ) {
+
+          button.classList.add(
+            "selected"
+          );
+
+        }
+
+        button.innerHTML =
+          String(index + 1) +
+          "<small>" +
+          item.name +
+          "</small>";
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            currentLevel =
+              index;
+
+            startLevel();
+
+          }
+        );
+
+        phaseList.appendChild(
+          button
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =========================
+     INICIAR FASE
+     ========================= */
+
+  function startLevel() {
+
+    level =
+      levels[currentLevel];
+
+    playing = true;
+
+    finishedLevel = false;
+
+    message.style.display =
+      "none";
+
+    phaseMenu.style.display =
+      "none";
+
+    lives = 3;
+
+    collected = 0;
+
+    cameraX = 0;
+
+    buildWorld();
+
+    resetPlayer();
+
+    updateHUD();
+
+    lastTime =
+      performance.now();
+
+    if (animation) {
+
+      cancelAnimationFrame(
+        animation
+      );
+
+    }
+
+    animation =
+      requestAnimationFrame(
+        loop
+      );
+
+  }
+
+
+  /* =========================
+     CONSTRUIR MUNDO
+     ========================= */
+
+  function buildWorld() {
+
+    world.innerHTML = "";
+
+    world.appendChild(player);
+
+    platforms = [];
+
+    coins = [];
+
+
+    level.platforms.forEach(
+      (data) => {
+
+        const element =
+          document.createElement(
+            "div"
+          );
+
+        element.className =
+          "platform";
+
+        element.style.left =
+          data[0] + "px";
+
+        element.style.top =
+          data[1] + "px";
+
+        element.style.width =
+          data[2] + "px";
+
+        element.style.height =
+          data[3] + "px";
+
+        world.appendChild(
+          element
+        );
+
+        platforms.push({
+
+          x: data[0],
+          y: data[1],
+          w: data[2],
+          h: data[3],
+
+          element
+
+        });
+
+      }
+    );
+
+
+    level.coins.forEach(
+      (data) => {
+
+        const element =
+          document.createElement(
+            "div"
+          );
+
+        element.className =
+          "coin";
+
+        element.textContent =
+          "1";
+
+        element.style.left =
+          data[0] + "px";
+
+        element.style.top =
+          data[1] + "px";
+
+        world.appendChild(
+          element
+        );
+
+        coins.push({
+
+          x: data[0],
+          y: data[1],
+
+          collected: false,
+
+          element
+
+        });
+
+      }
+    );
+
+
+    goal =
+      document.createElement(
+        "div"
+      );
+
+    goal.className =
+      "goal";
+
+    goal.style.left =
+      level.goal + "px";
+
+    goal.style.top =
+      "365px";
+
+    world.appendChild(
+      goal
+    );
+
+  }
+
+
+  /* =========================
+     RESET PLAYER
+     ========================= */
+
+  function resetPlayer() {
+
+    physics.x =
+      level.spawn.x;
+
+    physics.y =
+      level.spawn.y;
+
+    physics.vx =
+      0;
+
+    physics.vy =
+      0;
+
+    physics.grounded =
+      false;
+
+  }
+
+
+  /* =========================
+     HUD
+     ========================= */
+
+  function updateHUD() {
+
+    coinCount.textContent =
+      collected;
+
+    coinTotal.textContent =
+      level.coins.length;
+
+    lifeCount.textContent =
+      lives;
+
+    phaseHud.textContent =
+      "FASE " +
+      (currentLevel + 1);
+
+    headerPhase.textContent =
+      currentLevel + 1;
+
+  }
+
+
+  /* =========================
+     PULO
+     ========================= */
+
+  function jump() {
+
+    if (!playing) {
+      return;
+    }
+
+    if (!physics.grounded) {
+      return;
+    }
+
+    physics.vy =
+      physics.jumpPower;
+
+    physics.grounded =
+      false;
+
+  }
+
+
+  /* =========================
+     TECLADO
+     ========================= */
+
+  window.addEventListener(
+    "keydown",
+    (event) => {
+
+      const key =
+        event.key.toLowerCase();
+
+
+      if (
+        key === "arrowleft" ||
+        key === "a"
+      ) {
+
+        keys.left = true;
+
+        event.preventDefault();
+
+      }
+
+
+      if (
+        key === "arrowright" ||
+        key === "d"
+      ) {
+
+        keys.right = true;
+
+        event.preventDefault();
+
+      }
+
+
+      if (
+        key === "arrowup" ||
+        key === "w" ||
+        key === " "
+      ) {
+
+        if (!event.repeat) {
+          jump();
+        }
+
+        event.preventDefault();
+
+      }
+
+    }
+  );
+
+
+  window.addEventListener(
+    "keyup",
+    (event) => {
+
+      const key =
+        event.key.toLowerCase();
+
+
+      if (
+        key === "arrowleft" ||
+        key === "a"
+      ) {
+
+        keys.left = false;
+
+      }
+
+
+      if (
+        key === "arrowright" ||
+        key === "d"
+      ) {
+
+        keys.right = false;
+
+      }
+
+    }
+  );
+
+
+  /* =========================
+     CONTROLES TOUCH
+     ========================= */
+
+  function holdButton(
+    element,
+    property
+  ) {
+
+    const down =
+      (event) => {
+
+        event.preventDefault();
+
+        keys[property] =
+          true;
+
+      };
+
+
+    const up =
+      (event) => {
+
+        event.preventDefault();
+
+        keys[property] =
+          false;
+
+      };
+
+
+    element.addEventListener(
+      "pointerdown",
+      down
+    );
+
+    element.addEventListener(
+      "pointerup",
+      up
+    );
+
+    element.addEventListener(
+      "pointercancel",
+      up
+    );
+
+    element.addEventListener(
+      "pointerleave",
+      up
+    );
+
+  }
+
+
+  holdButton(
+    document.getElementById("left"),
+    "left"
+  );
+
+
+  holdButton(
+    document.getElementById("right"),
+    "right"
+  );
+
+
+  document
+    .getElementById("jump")
+    .addEventListener(
+      "pointerdown",
+      (event) => {
+
+        event.preventDefault();
+
+        jump();
+
+      }
+    );
+
+
+  /* =========================
+     COLISÃO
+     ========================= */
+
+  function intersects(
+    ax,
+    ay,
+    aw,
+    ah,
+    bx,
+    by,
+    bw,
+    bh
+  ) {
+
+    return (
+      ax < bx + bw &&
+      ax + aw > bx &&
+      ay < by + bh &&
+      ay + ah > by
+    );
+
+  }
+
+
+  /* =========================
+     FÍSICA
+     ========================= */
+
+  function updatePhysics(dt) {
+
+    const oldX =
+      physics.x;
+
+    const oldY =
+      physics.y;
+
+
+    if (keys.left) {
+
+      physics.vx -=
+        physics.acceleration * dt;
+
+    }
+
+
+    if (keys.right) {
+
+      physics.vx +=
+        physics.acceleration * dt;
+
+    }
+
+
+    if (
+      !keys.left &&
+      !keys.right
+    ) {
+
+      physics.vx *=
+        Math.pow(0.80, dt);
+
+    }
+
+
+    physics.vx =
+      Math.max(
+        -physics.maxSpeed,
+        Math.min(
+          physics.maxSpeed,
+          physics.vx
+        )
+      );
+
+
+    physics.x +=
+      physics.vx * dt;
+
+
+    physics.vy +=
+      physics.gravity * dt;
+
+    physics.y +=
+      physics.vy * dt;
+
+
+    physics.grounded =
+      false;
+
+
+    for (
+      const platform
+      of platforms
+    ) {
+
+      const hit =
+        intersects(
+          physics.x,
+          physics.y,
+          physics.width,
+          physics.height,
+
+          platform.x,
+          platform.y,
+          platform.w,
+          platform.h
+        );
+
+
+      if (!hit) {
+        continue;
+      }
+
+
+      if (
+        oldY +
+          physics.height
+          <=
+          platform.y + 10 &&
+        physics.vy >= 0
+      ) {
+
+        physics.y =
+          platform.y -
+          physics.height;
+
+        physics.vy = 0;
+
+        physics.grounded =
+          true;
+
+        continue;
+
+      }
+
+
+      if (
+        oldY >=
+          platform.y +
+          platform.h -
+          5 &&
+        physics.vy < 0
+      ) {
+
+        physics.y =
+          platform.y +
+          platform.h;
+
+        physics.vy =
+          0;
+
+        continue;
+
+      }
+
+
+      if (
+        oldX +
+          physics.width
+          <=
+          platform.x
+      ) {
+
+        physics.x =
+          platform.x -
+          physics.width;
+
+        physics.vx =
+          0;
+
+        continue;
+
+      }
+
+
+      if (
+        oldX >=
+          platform.x +
+          platform.w
+      ) {
+
+        physics.x =
+          platform.x +
+          platform.w;
+
+        physics.vx =
+          0;
+
+      }
+
+    }
+
+
+    if (physics.x < 0) {
+
+      physics.x = 0;
+
+      physics.vx = 0;
+
+    }
+
+
+    if (physics.y > 620) {
+
+      loseLife();
+
+    }
+
+  }
+
+
+  /* =========================
+     MOEDAS
+     ========================= */
+
+  function checkCoins() {
+
+    for (
+      const coin
+      of coins
+    ) {
+
+      if (coin.collected) {
+        continue;
+      }
+
+
+      const hit =
+        intersects(
+          physics.x,
+          physics.y,
+          physics.width,
+          physics.height,
+
+          coin.x,
+          coin.y,
+          27,
+          27
+        );
+
+
+      if (hit) {
+
+        coin.collected =
+          true;
+
+        coin.element.classList.add(
+          "collected"
+        );
+
+        collected++;
+
+        updateHUD();
+
+      }
+
+    }
+
+  }
+
+
+  /* =========================
+     META
+     ========================= */
+
+  function checkGoal() {
+
+    if (!goal) {
+      return;
+    }
+
+
+    if (
+      physics.x +
+        physics.width >=
+      level.goal
+    ) {
+
+      winLevel();
+
+    }
+
+  }
+
+
+  /* =========================
+     PERDER VIDA
+     ========================= */
+
+  function loseLife() {
+
+    if (!playing) {
+      return;
+    }
+
+
+    lives--;
+
+    updateHUD();
+
+
+    if (lives <= 0) {
+
+      gameOver();
+
+      return;
+
+    }
+
+
+    resetPlayer();
+
+  }
+
+
+  /* =========================
+     GAME OVER
+     ========================= */
+
+  function gameOver() {
+
+    playing =
+      false;
+
+    messageTitle.textContent =
+      "💔 FIM DE JOGO";
+
+    messageText.textContent =
+      "Você perdeu todas as vidas.";
+
+    message.style.display =
+      "flex";
+
+  }
+
+
+  /* =========================
+     VITÓRIA
+     ========================= */
+
+  function winLevel() {
+
+    if (finishedLevel) {
+      return;
+    }
+
+    finishedLevel =
+      true;
+
+    playing =
+      false;
+
+
+    if (
+      currentLevel <
+      levels.length - 1
+    ) {
+
+      messageTitle.textContent =
+        "🏆 FASE CONCLUÍDA!";
+
+      messageText.textContent =
+        "Moedas: " +
+        collected +
+        "/" +
+        level.coins.length +
+        ". Próxima fase liberada.";
+
+    } else {
+
+      messageTitle.textContent =
+        "🎉 PARABÉNS!";
+
+      messageText.textContent =
+        "Você terminou todas as fases do Bounce!";
+
+    }
+
+
+    message.style.display =
+      "flex";
+
+  }
+
+
+  /* =========================
+     REINICIAR
+     ========================= */
+
+  restart.addEventListener(
+    "click",
+    () => {
+
+      if (
+        finishedLevel &&
+        currentLevel <
+        levels.length - 1
+      ) {
+
+        currentLevel++;
+
+      }
+
+      startLevel();
+
+    }
+  );
+
+
+  /* =========================
+     CÂMERA
+     ========================= */
+
+  function updateCamera() {
+
+    const screenWidth =
+      game.clientWidth;
+
+
+    const target =
+      physics.x -
+      screenWidth * 0.38;
+
+
+    cameraX +=
+      (
+        target -
+        cameraX
+      ) * 0.08;
+
+
+    const maxCamera =
+      Math.max(
+        0,
+        level.width -
+        screenWidth
+      );
+
+
+    cameraX =
+      Math.max(
+        0,
+        Math.min(
+          maxCamera,
+          cameraX
+        )
+      );
+
+
+    world.style.transform =
+      "translateX(" +
+      (-cameraX) +
+      "px)";
+
+  }
+
+
+  /* =========================
+     RENDER
+     ========================= */
+
+  function render() {
+
+    player.style.left =
+      physics.x + "px";
+
+    player.style.top =
+      physics.y + "px";
+
+    updateCamera();
+
+  }
+
+
+  /* =========================
+     LOOP
+     ========================= */
+
+  function loop(timestamp) {
+
+    if (!playing) {
+      return;
+    }
+
+
+    let dt =
+      (
+        timestamp -
+        lastTime
+      ) / 16.666;
+
+
+    lastTime =
+      timestamp;
+
+
+    dt =
+      Math.min(
+        dt,
+        2
+      );
+
+
+    updatePhysics(dt);
+
+    checkCoins();
+
+    checkGoal();
+
+    render();
+
+
+    animation =
+      requestAnimationFrame(
+        loop
+      );
+
+  }
+
+
+  /* =========================
+     INICIALIZAÇÃO
+     ========================= */
+
+  createPhaseMenu();
+
+})();
+
+</script>
+<a class="voltar" href="../">← Catálogo</a></html>

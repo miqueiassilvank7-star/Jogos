@@ -1,0 +1,2013 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Tetris</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head>
+
+<style>
+
+:root{
+  --accent-a:#8b6cf0;
+  --accent-b:#4fa8e0;
+  --ink:#f2f5f7;
+  --ink-dim:rgba(242,245,247,.55);
+  --ink-faint:rgba(242,245,247,.4);
+}
+*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-sizing:border-box}
+body{margin:0;background:transparent;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);touch-action:manipulation}
+.wrap{width:100%;max-width:620px;margin:auto;padding:16px}
+.card{background:linear-gradient(180deg,rgba(34,45,53,.97),rgba(24,33,40,.97));border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.head{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent-b);opacity:.85}
+.title{font-size:16px;font-weight:800;color:#fff;letter-spacing:.3px;margin-top:2px}
+.stats{display:flex;gap:16px;text-align:right}
+.value{font:800 17px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff;font-variant-numeric:tabular-nums}
+.label{font-size:8px;font-weight:700;color:var(--ink-faint);letter-spacing:1.2px;margin-bottom:3px}
+.main{padding:16px}
+.board{position:relative;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.05),rgba(0,0,0,0) 60%),rgba(4,9,12,.4);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:inset 0 0 24px rgba(0,0,0,.35)}
+.board canvas{display:block;width:100%;height:auto}
+.controls{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.button{min-height:46px;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;font-weight:700;font-size:12px;letter-spacing:.3px;background:rgba(255,255,255,.06);padding:0 16px;transition:transform .08s ease,filter .08s ease}
+.button:active{transform:scale(.94);filter:brightness(1.15)}
+.primary{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));border-color:rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(139,108,240,.35)}
+.status{text-align:center;font:10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink-faint);letter-spacing:.3px;margin-top:12px;min-height:12px}
+.overlay{position:absolute;inset:0;background:rgba(10,15,19,.88);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:5;animation:fade-in .18s ease}
+.overlay.hidden{display:none}
+.overlay-title{font-size:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,#fff,var(--accent-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.overlay-sub{font-size:11px;color:var(--ink-dim);letter-spacing:.2px;margin-top:8px;max-width:280px}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #d7d7d7;
+  font-family: Arial, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+#tetrisGame {
+  width: min(100%, 460px);
+  margin: 0 auto;
+  padding: 10px;
+  background: #202020;
+  border: 2px solid #000;
+  border-radius: 10px;
+  color: #fff;
+}
+
+#title {
+  text-align: center;
+  font-size: 25px;
+  font-weight: bold;
+  padding: 4px 0 10px;
+}
+
+/* =========================
+   ÁREA PRINCIPAL
+========================= */
+
+#mainArea {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* =========================
+   TABULEIRO
+========================= */
+
+#board {
+  position: relative;
+
+  /*
+   * 10 colunas x 22 linhas
+   * Mantém a proporção correta.
+   */
+  width: min(58vw, 260px);
+  aspect-ratio: 10 / 22;
+
+  background: #000;
+  border: 2px solid #fff;
+
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/*
+ * Cada quadrado usa porcentagem.
+ * Assim nunca sai do tabuleiro,
+ * mesmo quando o WhatsApp redimensionar a página.
+ */
+
+.block {
+  position: absolute;
+
+  width: 10%;
+  height: calc(100% / 22);
+
+  border: 1px solid #fff;
+}
+
+/* Cores */
+
+.type0 {
+  background: #a000f0;
+}
+
+.type1 {
+  background: #00f0f0;
+}
+
+.type2 {
+  background: #f0a000;
+}
+
+.type3 {
+  background: #0000f0;
+}
+
+.type4 {
+  background: #00f000;
+}
+
+.type5 {
+  background: #f00000;
+}
+
+.type6 {
+  background: #f0f000;
+}
+
+/* =========================
+   PAINEL
+========================= */
+
+#info {
+  width: 110px;
+  min-width: 110px;
+  background: #000;
+  border: 1px solid #fff;
+  padding: 7px;
+
+  text-align: center;
+
+  min-height: 420px;
+}
+
+.infoTitle {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.infoItem {
+  margin: 7px 0;
+}
+
+.infoLabel {
+  font-size: 14px;
+}
+
+.infoValue {
+  font-size: 17px;
+  font-weight: bold;
+  margin-top: 2px;
+}
+
+/* =========================
+   PRÓXIMA PEÇA
+========================= */
+
+#next_shape {
+  position: relative;
+
+  width: 100%;
+  height: 82px;
+
+  background: #000;
+  border: 1px solid #fff;
+
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.nextBlock {
+  position: absolute;
+
+  width: 18px;
+  height: 18px;
+
+  border: 1px solid #fff;
+}
+
+/* =========================
+   BOTÕES DO PAINEL
+========================= */
+
+#start,
+#pause {
+  width: 100%;
+
+  border-radius: 7px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  touch-action: manipulation;
+
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#start {
+  margin-top: 5px;
+
+  min-height: 45px;
+
+  border: 0;
+
+  background: #e1ff5f;
+  color: #202020;
+
+  font-size: 17px;
+}
+
+#pause {
+  margin-top: 6px;
+
+  min-height: 40px;
+
+  border: 1px solid #aaa;
+
+  background: #333;
+  color: #fff;
+
+  font-size: 15px;
+}
+
+#start:active,
+#pause:active {
+  transform: scale(.96);
+}
+
+/* =========================
+   MENSAGEM
+========================= */
+
+#message {
+  position: absolute;
+
+  inset: 0;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-direction: column;
+
+  background: rgba(0, 0, 0, .84);
+
+  z-index: 50;
+
+  text-align: center;
+}
+
+#message h1 {
+  margin: 0 0 8px;
+
+  font-size: 26px;
+}
+
+#message p {
+  margin: 0;
+
+  font-size: 14px;
+}
+
+/* =========================
+   CONTROLES
+========================= */
+
+#controls {
+  width: 100%;
+
+  max-width: 360px;
+
+  margin: 12px auto 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 7px;
+}
+
+.control {
+  height: 48px;
+
+  border: 1px solid #aaa;
+
+  border-radius: 8px;
+
+  background: #333;
+
+  color: #fff;
+
+  font-size: 22px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  touch-action: manipulation;
+
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.control:active {
+  transform: scale(.92);
+  background: #555;
+}
+
+#rotate {
+  grid-column: 2;
+}
+
+#left {
+  grid-column: 1;
+}
+
+#down {
+  grid-column: 2;
+}
+
+#right {
+  grid-column: 3;
+}
+
+#drop {
+  grid-column: 1 / 4;
+
+  height: 43px;
+
+  font-size: 15px;
+}
+
+/* =========================
+   TELAS PEQUENAS
+========================= */
+
+@media (max-width: 360px) {
+
+  #tetrisGame {
+    padding: 7px;
+  }
+
+  #title {
+    font-size: 21px;
+  }
+
+  #board {
+    width: min(56vw, 210px);
+  }
+
+  #info {
+    width: 100px;
+    min-width: 100px;
+    padding: 5px;
+  }
+
+  .infoLabel {
+    font-size: 12px;
+  }
+
+  .infoValue {
+    font-size: 16px;
+  }
+
+  #next_shape {
+    height: 70px;
+  }
+
+  #start {
+    font-size: 15px;
+  }
+
+  #pause {
+    font-size: 13px;
+  }
+
+  .control {
+    height: 44px;
+  }
+}
+</style>
+
+
+<div id="tetrisGame">
+
+  <div id="title">
+    🧱 TETRIS
+  </div>
+
+
+  <div id="mainArea">
+
+    <!-- TABULEIRO -->
+
+    <div id="board">
+
+      <div id="message">
+
+        <h1 id="messageTitle">
+          GAME OVER
+        </h1>
+
+        <p id="messageText">
+          Toque em REINICIAR
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- INFORMAÇÕES -->
+
+    <div id="info">
+
+      <div class="infoTitle">
+        PRÓXIMA
+      </div>
+
+      <div id="next_shape"></div>
+
+
+      <div class="infoItem">
+
+        <div class="infoLabel">
+          LEVEL
+        </div>
+
+        <div
+          class="infoValue"
+          id="level"
+        >
+          1
+        </div>
+
+      </div>
+
+
+      <div class="infoItem">
+
+        <div class="infoLabel">
+          LINHAS
+        </div>
+
+        <div
+          class="infoValue"
+          id="lines"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="infoItem">
+
+        <div class="infoLabel">
+          SCORE
+        </div>
+
+        <div
+          class="infoValue"
+          id="score"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="infoItem">
+
+        <div class="infoLabel">
+          TEMPO
+        </div>
+
+        <div
+          class="infoValue"
+          id="time"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <button id="start">
+        START
+      </button>
+
+
+      <button id="pause">
+        PAUSAR
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- CONTROLES -->
+
+  <div id="controls">
+
+    <button
+      class="control"
+      id="rotate"
+      type="button"
+    >
+      🔄
+    </button>
+
+
+    <button
+      class="control"
+      id="left"
+      type="button"
+    >
+      ⬅️
+    </button>
+
+
+    <button
+      class="control"
+      id="down"
+      type="button"
+    >
+      ⬇️
+    </button>
+
+
+    <button
+      class="control"
+      id="right"
+      type="button"
+    >
+      ➡️
+    </button>
+
+
+    <button
+      class="control"
+      id="drop"
+      type="button"
+    >
+      ⬇️ QUEDA RÁPIDA
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+(function () {
+
+  "use strict";
+
+
+  /*
+   * ============================
+   * CONFIGURAÇÃO
+   * ============================
+   */
+
+  var COLS = 10;
+
+  var ROWS = 22;
+
+
+  /*
+   * ============================
+   * ELEMENTOS
+   * ============================
+   */
+
+  var boardEl =
+    document.getElementById("board");
+
+  var nextEl =
+    document.getElementById("next_shape");
+
+  var startBtn =
+    document.getElementById("start");
+
+  var pauseBtn =
+    document.getElementById("pause");
+
+  var messageEl =
+    document.getElementById("message");
+
+  var messageTitle =
+    document.getElementById("messageTitle");
+
+  var messageText =
+    document.getElementById("messageText");
+
+  var scoreEl =
+    document.getElementById("score");
+
+  var linesEl =
+    document.getElementById("lines");
+
+  var levelEl =
+    document.getElementById("level");
+
+  var timeEl =
+    document.getElementById("time");
+
+
+  /*
+   * ============================
+   * PEÇAS
+   * ============================
+   *
+   * 0 = T
+   * 1 = I
+   * 2 = L
+   * 3 = J
+   * 4 = S
+   * 5 = Z
+   * 6 = O
+   */
+
+  var SHAPES = [
+
+    [
+      [-1, 0],
+      [0, 0],
+      [1, 0],
+      [0, 1]
+    ],
+
+    [
+      [-1, 0],
+      [0, 0],
+      [1, 0],
+      [2, 0]
+    ],
+
+    [
+      [-1, -1],
+      [-1, 0],
+      [0, 0],
+      [1, 0]
+    ],
+
+    [
+      [1, -1],
+      [-1, 0],
+      [0, 0],
+      [1, 0]
+    ],
+
+    [
+      [0, -1],
+      [1, -1],
+      [-1, 0],
+      [0, 0]
+    ],
+
+    [
+      [-1, -1],
+      [0, -1],
+      [0, 0],
+      [1, 0]
+    ],
+
+    [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1]
+    ]
+
+  ];
+
+
+  /*
+   * ============================
+   * VARIÁVEIS DO JOGO
+   * ============================
+   */
+
+  var board = [];
+
+  var current = null;
+
+  var nextType = null;
+
+  var score = 0;
+
+  var lines = 0;
+
+  var level = 1;
+
+  var time = 0;
+
+  var running = false;
+
+  var paused = false;
+
+  var dropTimer = null;
+
+  var clockTimer = null;
+
+
+  /*
+   * ============================
+   * TABULEIRO
+   * ============================
+   */
+
+  function createBoard() {
+
+    board = [];
+
+    for (var y = 0; y < ROWS; y++) {
+
+      board[y] = [];
+
+      for (var x = 0; x < COLS; x++) {
+
+        board[y][x] = -1;
+
+      }
+
+    }
+
+  }
+
+
+  /*
+   * ============================
+   * COPIAR PEÇA
+   * ============================
+   */
+
+  function copyShape(shape) {
+
+    var result = [];
+
+    for (var i = 0; i < shape.length; i++) {
+
+      result.push([
+        shape[i][0],
+        shape[i][1]
+      ]);
+
+    }
+
+    return result;
+
+  }
+
+
+  /*
+   * ============================
+   * CRIAR PEÇA
+   * ============================
+   */
+
+  function createPiece() {
+
+    var type = nextType;
+
+    if (type === null) {
+
+      type =
+        Math.floor(
+          Math.random() * SHAPES.length
+        );
+
+    }
+
+    nextType =
+      Math.floor(
+        Math.random() * SHAPES.length
+      );
+
+
+    current = {
+
+      type: type,
+
+      shape: copyShape(
+        SHAPES[type]
+      ),
+
+      x: 4,
+
+      y: 1
+
+    };
+
+
+    drawNext();
+
+
+    if (
+      collision(
+        current.x,
+        current.y,
+        current.shape
+      )
+    ) {
+
+      gameOver();
+
+    }
+
+  }
+
+
+  /*
+   * ============================
+   * COLISÃO
+   * ============================
+   */
+
+  function collision(x, y, shape) {
+
+    for (
+      var i = 0;
+      i < shape.length;
+      i++
+    ) {
+
+      var px =
+        x + shape[i][0];
+
+      var py =
+        y + shape[i][1];
+
+
+      /*
+       * Parede esquerda/direita
+       */
+
+      if (
+        px < 0 ||
+        px >= COLS
+      ) {
+
+        return true;
+
+      }
+
+
+      /*
+       * Fundo
+       */
+
+      if (py >= ROWS) {
+
+        return true;
+
+      }
+
+
+      /*
+       * Bloco ocupado
+       */
+
+      if (
+        py >= 0 &&
+        board[py][px] !== -1
+      ) {
+
+        return true;
+
+      }
+
+    }
+
+    return false;
+
+  }
+
+
+  /*
+   * ============================
+   * MOVER
+   * ============================
+   */
+
+  function moveLeft() {
+
+    if (!running || paused || !current) {
+      return;
+    }
+
+    if (
+      !collision(
+        current.x - 1,
+        current.y,
+        current.shape
+      )
+    ) {
+
+      current.x--;
+
+      render();
+
+    }
+
+  }
+
+
+  function moveRight() {
+
+    if (!running || paused || !current) {
+      return;
+    }
+
+    if (
+      !collision(
+        current.x + 1,
+        current.y,
+        current.shape
+      )
+    ) {
+
+      current.x++;
+
+      render();
+
+    }
+
+  }
+
+
+  function moveDown() {
+
+    if (!running || paused || !current) {
+      return;
+    }
+
+
+    if (
+      !collision(
+        current.x,
+        current.y + 1,
+        current.shape
+      )
+    ) {
+
+      current.y++;
+
+    } else {
+
+      lockPiece();
+
+    }
+
+
+    render();
+
+  }
+
+
+  /*
+   * ============================
+   * QUEDA RÁPIDA
+   * ============================
+   */
+
+  function hardDrop() {
+
+    if (!running || paused || !current) {
+      return;
+    }
+
+
+    var distance = 0;
+
+
+    while (
+      !collision(
+        current.x,
+        current.y + 1,
+        current.shape
+      )
+    ) {
+
+      current.y++;
+
+      distance++;
+
+    }
+
+
+    score += distance * 2;
+
+    updateInfo();
+
+
+    lockPiece();
+
+    render();
+
+  }
+
+
+  /*
+   * ============================
+   * ROTAÇÃO
+   * ============================
+   */
+
+  function rotate() {
+
+    if (!running || paused || !current) {
+      return;
+    }
+
+
+    /*
+     * Quadrado não precisa girar.
+     */
+
+    if (current.type === 6) {
+      return;
+    }
+
+
+    var rotated = [];
+
+
+    for (
+      var i = 0;
+      i < current.shape.length;
+      i++
+    ) {
+
+      var x =
+        current.shape[i][0];
+
+      var y =
+        current.shape[i][1];
+
+
+      rotated.push([
+        -y,
+        x
+      ]);
+
+    }
+
+
+    /*
+     * Rotação normal
+     */
+
+    if (
+      !collision(
+        current.x,
+        current.y,
+        rotated
+      )
+    ) {
+
+      current.shape = rotated;
+
+      render();
+
+      return;
+
+    }
+
+
+    /*
+     * Tenta uma casa para esquerda.
+     */
+
+    if (
+      !collision(
+        current.x - 1,
+        current.y,
+        rotated
+      )
+    ) {
+
+      current.x--;
+
+      current.shape = rotated;
+
+      render();
+
+      return;
+
+    }
+
+
+    /*
+     * Tenta uma casa para direita.
+     */
+
+    if (
+      !collision(
+        current.x + 1,
+        current.y,
+        rotated
+      )
+    ) {
+
+      current.x++;
+
+      current.shape = rotated;
+
+      render();
+
+    }
+
+  }
+
+
+  /*
+   * ============================
+   * FIXAR PEÇA
+   * ============================
+   */
+
+  function lockPiece() {
+
+    for (
+      var i = 0;
+      i < current.shape.length;
+      i++
+    ) {
+
+      var x =
+        current.x +
+        current.shape[i][0];
+
+      var y =
+        current.y +
+        current.shape[i][1];
+
+
+      if (
+        y >= 0 &&
+        y < ROWS &&
+        x >= 0 &&
+        x < COLS
+      ) {
+
+        board[y][x] =
+          current.type;
+
+      }
+
+    }
+
+
+    clearLines();
+
+    createPiece();
+
+  }
+
+
+  /*
+   * ============================
+   * LINHAS
+   * ============================
+   */
+
+  function clearLines() {
+
+    var removed = 0;
+
+
+    for (
+      var y = ROWS - 1;
+      y >= 0;
+      y--
+    ) {
+
+      var full = true;
+
+
+      for (
+        var x = 0;
+        x < COLS;
+        x++
+      ) {
+
+        if (board[y][x] === -1) {
+
+          full = false;
+
+          break;
+
+        }
+
+      }
+
+
+      if (full) {
+
+        board.splice(y, 1);
+
+
+        var newRow = [];
+
+
+        for (
+          var n = 0;
+          n < COLS;
+          n++
+        ) {
+
+          newRow.push(-1);
+
+        }
+
+
+        board.unshift(newRow);
+
+        removed++;
+
+        y++;
+
+      }
+
+    }
+
+
+    if (removed > 0) {
+
+      lines += removed;
+
+
+      var points = [
+        0,
+        100,
+        300,
+        500,
+        800
+      ];
+
+
+      score +=
+        points[removed] * level;
+
+
+      level =
+        Math.floor(lines / 10) + 1;
+
+
+      if (level > 10) {
+        level = 10;
+      }
+
+
+      updateInfo();
+
+      restartDropTimer();
+
+    }
+
+  }
+
+
+  /*
+   * ============================
+   * DESENHAR BLOCO
+   * ============================
+   *
+   * IMPORTANTE:
+   *
+   * Usamos porcentagem.
+   *
+   * 10% = uma coluna.
+   *
+   * 1/22 = uma linha.
+   *
+   * Dessa forma os blocos
+   * nunca ultrapassam o tabuleiro.
+   */
+
+  function createBlock(x, y, type) {
+
+    if (
+      x < 0 ||
+      x >= COLS ||
+      y < 0 ||
+      y >= ROWS
+    ) {
+
+      return;
+
+    }
+
+
+    var block =
+      document.createElement("div");
+
+
+    block.className =
+      "block type" + type;
+
+
+    block.style.left =
+      (x * 10) + "%";
+
+
+    block.style.top =
+      (y * (100 / ROWS)) + "%";
+
+
+    boardEl.appendChild(block);
+
+  }
+
+
+  /*
+   * ============================
+   * RENDER
+   * ============================
+   */
+
+  function render() {
+
+    var blocks =
+      boardEl.querySelectorAll(
+        ".block"
+      );
+
+
+    for (
+      var i = 0;
+      i < blocks.length;
+      i++
+    ) {
+
+      blocks[i].remove();
+
+    }
+
+
+    /*
+     * Blocos fixos
+     */
+
+    for (
+      var y = 0;
+      y < ROWS;
+      y++
+    ) {
+
+      for (
+        var x = 0;
+        x < COLS;
+        x++
+      ) {
+
+        if (
+          board[y][x] !== -1
+        ) {
+
+          createBlock(
+            x,
+            y,
+            board[y][x]
+          );
+
+        }
+
+      }
+
+    }
+
+
+    /*
+     * Peça atual
+     */
+
+    if (current) {
+
+      for (
+        var j = 0;
+        j < current.shape.length;
+        j++
+      ) {
+
+        var px =
+          current.x +
+          current.shape[j][0];
+
+        var py =
+          current.y +
+          current.shape[j][1];
+
+
+        if (py >= 0) {
+
+          createBlock(
+            px,
+            py,
+            current.type
+          );
+
+        }
+
+      }
+
+    }
+
+  }
+
+
+  /*
+   * ============================
+   * PRÓXIMA PEÇA
+   * ============================
+   */
+
+  function drawNext() {
+
+    nextEl.innerHTML = "";
+
+
+    if (nextType === null) {
+      return;
+    }
+
+
+    var shape =
+      SHAPES[nextType];
+
+
+    var minX = 99;
+
+    var maxX = -99;
+
+    var minY = 99;
+
+    var maxY = -99;
+
+
+    for (
+      var i = 0;
+      i < shape.length;
+      i++
+    ) {
+
+      minX =
+        Math.min(
+          minX,
+          shape[i][0]
+        );
+
+      maxX =
+        Math.max(
+          maxX,
+          shape[i][0]
+        );
+
+      minY =
+        Math.min(
+          minY,
+          shape[i][1]
+        );
+
+      maxY =
+        Math.max(
+          maxY,
+          shape[i][1]
+        );
+
+    }
+
+
+    var size = 17;
+
+
+    var width =
+      (maxX - minX + 1) * size;
+
+
+    var height =
+      (maxY - minY + 1) * size;
+
+
+    var offsetX =
+      (nextEl.clientWidth - width) / 2;
+
+
+    var offsetY =
+      (nextEl.clientHeight - height) / 2;
+
+
+    for (
+      var j = 0;
+      j < shape.length;
+      j++
+    ) {
+
+      var block =
+        document.createElement("div");
+
+
+      block.className =
+        "nextBlock type" +
+        nextType;
+
+
+      block.style.left =
+        (
+          offsetX +
+          (shape[j][0] - minX) * size
+        ) + "px";
+
+
+      block.style.top =
+        (
+          offsetY +
+          (shape[j][1] - minY) * size
+        ) + "px";
+
+
+      nextEl.appendChild(block);
+
+    }
+
+  }
+
+
+  /*
+   * ============================
+   * INFORMAÇÕES
+   * ============================
+   */
+
+  function updateInfo() {
+
+    scoreEl.textContent =
+      score;
+
+    linesEl.textContent =
+      lines;
+
+    levelEl.textContent =
+      level;
+
+    timeEl.textContent =
+      time;
+
+  }
+
+
+  /*
+   * ============================
+   * VELOCIDADE
+   * ============================
+   */
+
+  function getSpeed() {
+
+    var speed =
+      700 -
+      ((level - 1) * 60);
+
+
+    if (speed < 100) {
+      speed = 100;
+    }
+
+
+    return speed;
+
+  }
+
+
+  /*
+   * ============================
+   * TIMER DA PEÇA
+   * ============================
+   */
+
+  function restartDropTimer() {
+
+    clearTimeout(dropTimer);
+
+
+    if (!running || paused) {
+      return;
+    }
+
+
+    dropTimer =
+      setTimeout(
+        function () {
+
+          moveDown();
+
+          restartDropTimer();
+
+        },
+        getSpeed()
+      );
+
+  }
+
+
+  /*
+   * ============================
+   * TIMER
+   * ============================
+   */
+
+  function startClock() {
+
+    clearInterval(clockTimer);
+
+
+    clockTimer =
+      setInterval(
+        function () {
+
+          if (
+            running &&
+            !paused
+          ) {
+
+            time++;
+
+            updateInfo();
+
+          }
+
+        },
+        1000
+      );
+
+  }
+
+
+  /*
+   * ============================
+   * COMEÇAR
+   * ============================
+   */
+
+  function startGame() {
+
+    clearTimeout(dropTimer);
+
+    clearInterval(clockTimer);
+
+
+    createBoard();
+
+
+    score = 0;
+
+    lines = 0;
+
+    level = 1;
+
+    time = 0;
+
+
+    current = null;
+
+    nextType = null;
+
+
+    running = true;
+
+    paused = false;
+
+
+    messageEl.style.display =
+      "none";
+
+
+    startBtn.textContent =
+      "REINICIAR";
+
+
+    pauseBtn.textContent =
+      "PAUSAR";
+
+
+    updateInfo();
+
+
+    createPiece();
+
+
+    render();
+
+
+    startClock();
+
+    restartDropTimer();
+
+  }
+
+
+  /*
+   * ============================
+   * PAUSAR
+   * ============================
+   */
+
+  function togglePause() {
+
+    if (!running) {
+      return;
+    }
+
+
+    paused = !paused;
+
+
+    if (paused) {
+
+      clearTimeout(dropTimer);
+
+
+      pauseBtn.textContent =
+        "CONTINUAR";
+
+
+      messageTitle.textContent =
+        "PAUSADO";
+
+
+      messageText.textContent =
+        "Toque em CONTINUAR";
+
+
+      messageEl.style.display =
+        "flex";
+
+
+    } else {
+
+      messageEl.style.display =
+        "none";
+
+
+      pauseBtn.textContent =
+        "PAUSAR";
+
+
+      restartDropTimer();
+
+    }
+
+  }
+
+
+  /*
+   * ============================
+   * GAME OVER
+   * ============================
+   */
+
+  function gameOver() {
+
+    running = false;
+
+    paused = false;
+
+
+    clearTimeout(dropTimer);
+
+    clearInterval(clockTimer);
+
+
+    messageTitle.textContent =
+      "GAME OVER";
+
+
+    messageText.textContent =
+      "Score: " + score;
+
+
+    messageEl.style.display =
+      "flex";
+
+
+    startBtn.textContent =
+      "REINICIAR";
+
+  }
+
+
+  /*
+   * ============================
+   * BOTÕES
+   * ============================
+   *
+   * Usamos pointerdown.
+   *
+   * Funciona melhor em:
+   *
+   * Android
+   * iPhone
+   * WhatsApp WebView
+   * navegador
+   */
+
+  function bindButton(id, action) {
+
+    var button =
+      document.getElementById(id);
+
+
+    if (!button) {
+      return;
+    }
+
+
+    button.addEventListener(
+      "pointerdown",
+      function (event) {
+
+        event.preventDefault();
+
+        action();
+
+      },
+      {
+        passive: false
+      }
+    );
+
+
+    /*
+     * Fallback para navegadores
+     * que não suportam pointer events.
+     */
+
+    button.addEventListener(
+      "touchstart",
+      function (event) {
+
+        event.preventDefault();
+
+      },
+      {
+        passive: false
+      }
+    );
+
+  }
+
+
+  /*
+   * ============================
+   * LIGA OS BOTÕES
+   * ============================
+   */
+
+  bindButton(
+    "start",
+    startGame
+  );
+
+
+  bindButton(
+    "pause",
+    togglePause
+  );
+
+
+  bindButton(
+    "left",
+    moveLeft
+  );
+
+
+  bindButton(
+    "right",
+    moveRight
+  );
+
+
+  bindButton(
+    "down",
+    moveDown
+  );
+
+
+  bindButton(
+    "rotate",
+    rotate
+  );
+
+
+  bindButton(
+    "drop",
+    hardDrop
+  );
+
+
+  /*
+   * ============================
+   * TECLADO
+   * ============================
+   */
+
+  document.addEventListener(
+    "keydown",
+    function (event) {
+
+      if (
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight" ||
+        event.key === "ArrowDown" ||
+        event.key === "ArrowUp" ||
+        event.key === " " ||
+        event.key === "Escape"
+      ) {
+
+        event.preventDefault();
+
+      }
+
+
+      switch (event.key) {
+
+        case "ArrowLeft":
+          moveLeft();
+          break;
+
+        case "ArrowRight":
+          moveRight();
+          break;
+
+        case "ArrowDown":
+          moveDown();
+          break;
+
+        case "ArrowUp":
+          rotate();
+          break;
+
+        case " ":
+          hardDrop();
+          break;
+
+        case "Escape":
+          togglePause();
+          break;
+
+      }
+
+    }
+  );
+
+
+  /*
+   * ============================
+   * INICIALIZAÇÃO
+   * ============================
+   */
+
+  createBoard();
+
+  updateInfo();
+
+})();
+
+</script>
+<a class="voltar" href="../">← Catálogo</a></html>

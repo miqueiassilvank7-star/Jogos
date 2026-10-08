@@ -1,0 +1,237 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Tiroaoalvo</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head><!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <style>*{
+    margin: 0;
+    padding: 0;
+}
+#menu{
+    display: flex;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+}
+.menuItens{
+    padding: 5px;
+    margin: 5px;
+}
+.menuInputRadio{
+    margin-right: -5px ;
+    margin-left: 5px;
+}
+#game{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#placar{
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.number{
+    width: 25px;
+    margin-right: 5px;
+}
+html,body{background:#fff!important;color:#000!important;min-height:100vh}
+#menu{height:auto;flex-wrap:wrap;padding:8px}
+.menuItens{font-size:16px}
+.number{width:60px;font-size:16px}
+canvas{width:100%;max-width:500px;height:auto;touch-action:manipulation;display:block}
+#game{padding:0 8px}
+</style>
+	<title>Jogo teste</title>
+</head>
+<body>
+    <div id="menu">
+        <button class="menuItens" data-js="iniciar" type="button">Iniciar</button><br>
+            <input class="menuInputRadio" type="radio" id="easy" name="mode" value="easy">
+            <label class="menuItens" for="easy"> Easy </label><br>
+            <input class="menuInputRadio" type="radio" id="regular" name="mode" value="regular">
+            <label class="menuItens" for="regular"> Regular </label><br>
+            <input class="menuInputRadio" type="radio" id="hard" name="mode" value="hard">
+            <label class="menuItens" for="hard"> Hard </label><br>
+            <label class="menuItens" for="numeroAlvo">Alvos:</label>
+            <input class="number" type="number" id="numeroAlvo" name="numeroAlvo" min="0">
+        <button disabled='true' class="menuItens" data-js="parar" id="parar"   type="button">Parar</button>
+    </div>
+
+    <div id="game">
+        <canvas data-js="canvas" width="500" height="500"></canvas>
+    </div>
+    <div id="placar">
+        <p id="acertos">Acertos: </p>
+        <p id="erros">Erros: </p>
+    </div>
+<script>(function(){
+'use strict'
+
+    // declaração de elementos html
+    const $canvas = document.querySelector('[data-js="canvas"]')
+    const $iniciar = document.querySelector('[data-js="iniciar"]')
+    const $parar = document.querySelector('[data-js="parar"]')
+    const $radio = document.getElementsByName("mode")
+    const $numeroAlvos = document.getElementById("numeroAlvo")
+    const $placar = document.getElementById('placar')
+    const $acertos = document.getElementById('acertos')
+    const $erros = document.getElementById('erros')
+    // declaração de elementos globais (coisas que não seriam necessárias com o react talvez)
+    var x   // gambiarra das feias, mas não ta errado
+    var y
+    var erros = 0
+    var acertos = 0
+    var numeroAlvos = 0
+    var intervalo
+    var total = 0
+    
+
+    // canvas
+    const drawer = $canvas.getContext('2d')
+
+    // dividi o código em blocos e comentei pra você entender o contexto
+
+    
+    // [BLOCO 1] verificadores de configurações do usuário
+
+    const verifyMode = () => {
+        var difficulty = ''
+        for (var i = 0; i < $radio.length; i++) {
+            if ($radio[i].checked) {
+                difficulty = $radio[i].value
+            }
+        }
+        return difficulty
+    }
+    const difficultyManager = () => {
+        var rules
+        switch (verifyMode()){
+            case 'easy' : return rules = {tempo: 1000, raio: 10};
+            case 'regular' : return rules = {tempo: 1000, raio: 8};
+            case 'hard' : return rules = {tempo: 500, raio: 8};
+            default: console.log('hola')
+        }
+    }
+
+    
+    // [BLOCO 2] o jogo funcionando em si, as funções estão em ordem seguindo um conceito parecido com um padrão middleware
+
+    const startGame  = () => {
+        resetCanvas()
+        const dificuldade = verifyMode()
+        numeroAlvos = $numeroAlvos.value
+            if (!dificuldade){
+                window.alert('Selecione um modo de jogo antes');
+                return;
+            }
+            if (numeroAlvos <= 0){
+                window.alert('Selecione um número de alvos antes');
+                return;
+            }
+            $placar.style.opacity = 100
+            $iniciar.disabled = true
+        drawCanvas() // next()
+        
+        
+    }
+
+    const drawCanvas = () => {
+        drawer.fillStyle="#000000"
+        drawer.fillRect(0,0,500,500)
+        var mensagem = `Jogando no modo ${verifyMode()}, o jogo já vai começar`
+        drawer.font="15pt Arial"
+        drawer.fillStyle="white"
+        drawer.fillText(mensagem,10,50)
+    setTimeout(startTime,2000) // next()
+
+    }
+    const startTime = () => {
+        resetCanvas()
+        limpaTela()
+        $parar.disabled = false
+        $canvas.removeEventListener('click',shootManager); $canvas.addEventListener('click',shootManager)
+        const specs = difficultyManager()
+
+        intervalo = setInterval(() => {
+            drawAlvo() // next()
+            total++
+            setTimeout(limpaTela,specs.tempo)
+            if (total > numeroAlvos - 1) {
+                clearInterval(intervalo)
+            }
+        }, specs.tempo + 500)
+
+
+    }
+    
+    const sorteiaposicao = (minimo,maximo) => {
+		return Math.floor(Math.random() * (maximo - minimo) + minimo)
+	}
+    
+    const drawAlvo = function drawAlvo () {
+        x = sorteiaposicao(20,480)
+        y = sorteiaposicao(20,480)
+        const specs = difficultyManager()
+        drawer.fillStyle='red'
+		drawer.beginPath();
+		drawer.arc(x, y, specs.raio + 10, 0,2*Math.PI);
+		drawer.fill();
+    }
+
+    // [BLOCO 3] funções necessárias pra manutenção do canvas
+
+    const shootManager = (evento) => {
+        const specs = difficultyManager()
+        const rect = $canvas.getBoundingClientRect(); var xClick = (evento.clientX - rect.left) * ($canvas.width / rect.width);
+        var yClick = (evento.clientY - rect.top) * ($canvas.height / rect.height);
+            if ((xClick > x-specs.raio-10) && (xClick < x + specs.raio+10) && (yClick > y-specs.raio-10) && (yClick < y + specs.raio+10)){
+				shootAcerto()
+            }
+
+    }
+
+    const limpaTela = () => {
+        drawer.fillStyle="#000000"
+        drawer.fillRect(0,0,500,500)
+        $acertos.innerHTML = `Acertos: ${acertos}`
+        $erros.innerHTML = `Erros: ${total - acertos}`
+    }
+    
+    const limpaCirculo = () => {
+        const specs = difficultyManager()
+        drawer.fillStyle='#000000'
+		drawer.beginPath();
+		drawer.arc(x, y, specs.raio + 10, 0,2*Math.PI);
+		drawer.fill();
+    }
+
+    const resetCanvas = () => {
+        erros = 0
+        acertos = 0
+        total = 0
+        $acertos.innerHTML = `Acertos: 0`
+        $erros.innerHTML = `Erros: 0`
+    }
+
+    const shootAcerto = () => { setTimeout(function(){ x = -1000; y = -1000 }, 0);
+        acertos++ 
+        limpaCirculo()
+    }
+    
+    const stopGame = () => {  
+        clearInterval(intervalo)
+        $iniciar.disabled = false
+        $parar.disabled = true
+        $acertos.innerHTML = `Acertos: ${acertos}`
+        $erros.innerHTML = `Erros: ${total - acertos}`
+        
+    }
+
+    $parar.addEventListener('click',stopGame)
+    $iniciar.addEventListener('click', startGame)
+
+
+})()</script>
+</body><a class="voltar" href="../">← Catálogo</a></html>

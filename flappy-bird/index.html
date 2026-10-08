@@ -1,0 +1,230 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>FLAPPY BIRD</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head><style>
+
+:root{
+  --accent-a:#8b6cf0;
+  --accent-b:#4fa8e0;
+  --ink:#f2f5f7;
+  --ink-dim:rgba(242,245,247,.55);
+  --ink-faint:rgba(242,245,247,.4);
+}
+*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-sizing:border-box}
+body{margin:0;background:transparent;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);touch-action:manipulation}
+.wrap{width:100%;max-width:620px;margin:auto;padding:16px}
+.card{background:linear-gradient(180deg,rgba(34,45,53,.97),rgba(24,33,40,.97));border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.head{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent-b);opacity:.85}
+.title{font-size:16px;font-weight:800;color:#fff;letter-spacing:.3px;margin-top:2px}
+.stats{display:flex;gap:16px;text-align:right}
+.value{font:800 17px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff;font-variant-numeric:tabular-nums}
+.label{font-size:8px;font-weight:700;color:var(--ink-faint);letter-spacing:1.2px;margin-bottom:3px}
+.main{padding:16px}
+.board{position:relative;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.05),rgba(0,0,0,0) 60%),rgba(4,9,12,.4);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:inset 0 0 24px rgba(0,0,0,.35)}
+.board canvas{display:block;width:100%;height:auto}
+.controls{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.button{min-height:46px;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;font-weight:700;font-size:12px;letter-spacing:.3px;background:rgba(255,255,255,.06);padding:0 16px;transition:transform .08s ease,filter .08s ease}
+.button:active{transform:scale(.94);filter:brightness(1.15)}
+.primary{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));border-color:rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(139,108,240,.35)}
+.status{text-align:center;font:10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink-faint);letter-spacing:.3px;margin-top:12px;min-height:12px}
+.overlay{position:absolute;inset:0;background:rgba(10,15,19,.88);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:5;animation:fade-in .18s ease}
+.overlay.hidden{display:none}
+.overlay-title{font-size:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,#fff,var(--accent-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.overlay-sub{font-size:11px;color:var(--ink-dim);letter-spacing:.2px;margin-top:8px;max-width:280px}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+
+body{cursor:pointer}
+</style>
+<body>
+<div class="wrap">
+<div class="card">
+<div class="head">
+<div><div class="brand">MSNK7BOT</div><div class="title">FLAPPY BIRD</div></div>
+<div class="stats"><div><div class="label">PONTOS</div><div class="value" id="score">00000</div></div><div><div class="label">RECORDE</div><div class="value" id="best">00000</div></div></div>
+</div>
+<div class="main">
+<div class="board" id="board">
+<canvas id="game" width="360" height="520"></canvas>
+<div id="overlay" class="overlay"><div id="gameTitle" class="overlay-title">FLAPPY BIRD</div><div id="gameSub" class="overlay-sub">TOQUE PARA VOAR &#8226; DESVIE DOS CANOS</div><button id="start" class="button primary" style="margin-top:15px">COME&#199;AR</button></div>
+</div>
+<div id="status" class="status">BEST 00000 &#8226; VELOCIDADE 1.0x</div>
+</div>
+</div>
+</div>
+<script>
+const c=document.getElementById('game');
+const x=c.getContext('2d');
+const board=document.getElementById('board');
+const scoreEl=document.getElementById('score');
+const bestEl=document.getElementById('best');
+const statusEl=document.getElementById('status');
+const overlay=document.getElementById('overlay');
+const gameTitle=document.getElementById('gameTitle');
+const gameSub=document.getElementById('gameSub');
+const start=document.getElementById('start');
+
+const W=360,H=520,GROUND_H=70;
+const GRAVITY=.34;
+const FLAP=-6.4;
+const PIPE_GAP=148;
+const PIPE_WIDTH=58;
+const PIPE_SPACING=200;
+const BASE_SPEED=2.4;
+
+let score=0,best=0,playing=false,speed=BASE_SPEED,last=0,frame=0;
+let bird={x:80,y:H/2,vy:0,r:13,rot:0};
+let pipes=[];
+
+try{best=parseInt(localStorage.getItem('takeshi_flappy_best')||'0',10)||0}catch(e){best=0}
+
+function pad(value){return String(Math.floor(value)).padStart(5,'0')}
+
+function updateUI(){
+scoreEl.textContent=pad(score);
+bestEl.textContent=pad(best);
+statusEl.textContent='BEST '+pad(best)+' • VELOCIDADE '+(speed/BASE_SPEED).toFixed(1)+'x';
+}
+
+function addPipe(px){
+const margin=60;
+const topH=margin+Math.random()*(H-GROUND_H-PIPE_GAP-margin*2);
+pipes.push({x:px,topH:topH,passed:false});
+}
+
+function seedPipes(){
+pipes=[];
+for(let i=0;i<3;i++)addPipe(420+i*PIPE_SPACING);
+}
+
+function reset(){
+bird={x:80,y:H/2,vy:0,r:13,rot:0};
+score=0;
+speed=BASE_SPEED;
+frame=0;
+last=0;
+seedPipes();
+playing=true;
+overlay.classList.add('hidden');
+updateUI();
+}
+
+function flap(){
+if(!playing){reset();return}
+bird.vy=FLAP;
+}
+
+function gameOver(){
+playing=false;
+best=Math.max(best,Math.floor(score));
+try{localStorage.setItem('takeshi_flappy_best',String(best))}catch(e){}
+gameTitle.textContent='GAME OVER';
+gameSub.textContent='SCORE '+pad(score)+' • TOQUE PARA TENTAR DE NOVO';
+start.textContent='JOGAR NOVAMENTE';
+overlay.classList.remove('hidden');
+updateUI();
+}
+
+function update(dt){
+frame+=dt;
+speed=Math.min(5.5,BASE_SPEED+score/22);
+
+bird.vy+=GRAVITY*dt;
+bird.y+=bird.vy*dt;
+bird.rot=Math.max(-.5,Math.min(1.3,bird.vy/10));
+
+for(let i=0;i<pipes.length;i++){
+const p=pipes[i];
+p.x-=speed*dt;
+if(!p.passed&&p.x+PIPE_WIDTH<bird.x){
+p.passed=true;
+score++;
+}
+}
+
+if(pipes.length&&pipes[0].x<-PIPE_WIDTH){
+pipes.shift();
+addPipe(pipes[pipes.length-1].x+PIPE_SPACING);
+}
+
+if(bird.y+bird.r>H-GROUND_H||bird.y-bird.r<0){gameOver();return}
+for(let i=0;i<pipes.length;i++){
+const p=pipes[i];
+const withinX=bird.x+bird.r>p.x&&bird.x-bird.r<p.x+PIPE_WIDTH;
+if(withinX){
+const hitTop=bird.y-bird.r<p.topH;
+const hitBottom=bird.y+bird.r>p.topH+PIPE_GAP;
+if(hitTop||hitBottom){gameOver();return}
+}
+}
+updateUI();
+}
+
+function drawBackground(){
+const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#2a4a52');bg.addColorStop(1,'#173039');x.fillStyle=bg;x.fillRect(0,0,W,H);
+x.fillStyle='rgba(242,245,247,.12)';
+const t=frame*.2;
+for(let i=0;i<3;i++){
+const cx=((i*140+t)%(W+100))-50;
+x.beginPath();x.ellipse(cx,70+i*60,28,15,0,0,Math.PI*2);x.fill();
+}
+}
+
+function drawPipes(){
+for(let i=0;i<pipes.length;i++){
+const p=pipes[i];
+x.fillStyle='#4fa8a0';x.strokeStyle='rgba(255,255,255,.15)';x.lineWidth=2;
+x.fillRect(p.x,0,PIPE_WIDTH,p.topH);x.strokeRect(p.x,0,PIPE_WIDTH,p.topH);
+x.fillRect(p.x-4,p.topH-18,PIPE_WIDTH+8,18);x.strokeRect(p.x-4,p.topH-18,PIPE_WIDTH+8,18);
+const by=p.topH+PIPE_GAP,bh=H-GROUND_H-by;
+x.fillRect(p.x,by,PIPE_WIDTH,bh);x.strokeRect(p.x,by,PIPE_WIDTH,bh);
+x.fillRect(p.x-4,by,PIPE_WIDTH+8,18);x.strokeRect(p.x-4,by,PIPE_WIDTH+8,18);
+}
+}
+
+function drawGround(){
+x.fillStyle='#3a3226';x.fillRect(0,H-GROUND_H,W,GROUND_H);
+x.fillStyle='rgba(242,245,247,.15)';
+const offset=(frame*speed)%28;
+for(let px=-offset;px<W;px+=28)x.fillRect(px,H-GROUND_H,14,8);
+}
+
+function drawBird(){
+x.save();
+x.translate(bird.x,bird.y);
+x.rotate(bird.rot);
+x.fillStyle='#f0c34d';x.strokeStyle='rgba(0,0,0,.25)';x.lineWidth=1.5;
+x.beginPath();x.ellipse(0,0,bird.r,bird.r*.8,0,0,Math.PI*2);x.fill();x.stroke();
+x.fillStyle='#d99f2e';
+x.beginPath();x.ellipse(-2,2,6,4.5,.3,0,Math.PI*2);x.fill();
+x.fillStyle='#fff';x.beginPath();x.arc(5,-4,3.5,0,Math.PI*2);x.fill();
+x.fillStyle='#1a1a1a';x.beginPath();x.arc(6,-4,1.8,0,Math.PI*2);x.fill();
+x.fillStyle='#e08a33';
+x.beginPath();x.moveTo(bird.r-2,-2);x.lineTo(bird.r+7,1);x.lineTo(bird.r-2,4.5);x.closePath();x.fill();
+x.restore();
+}
+
+function draw(){
+x.clearRect(0,0,W,H);
+drawBackground();
+drawPipes();
+drawGround();
+drawBird();
+}
+
+function loop(t){
+if(!last)last=t;
+const dt=Math.min((t-last)/16.67,2);
+last=t;
+if(playing)update(dt);
+draw();
+requestAnimationFrame(loop);
+}
+
+board.addEventListener('pointerdown',function(e){if(e.target===start)return;e.preventDefault();flap()});
+start.addEventListener('pointerdown',function(e){e.preventDefault();e.stopPropagation();reset()});
+document.addEventListener('keydown',function(e){if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();flap()}});
+
+seedPipes();
+draw();
+updateUI();
+requestAnimationFrame(loop);
+</script>
+</body><a class="voltar" href="../">← Catálogo</a></html>

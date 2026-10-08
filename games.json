@@ -1,0 +1,142 @@
+[
+  {
+    "slug": "bomberman",
+    "name": "BOMBERMAN",
+    "command": "bomberman",
+    "desc": "Bomberman: coloque bombas, exploda caixas e sobreviva.",
+    "wa": "https://wa.me/639678247845?text=%2Abomberman"
+  },
+  {
+    "slug": "bounce",
+    "name": "Bounce",
+    "command": "bounce",
+    "desc": "Jogue Bounce Tales no Takeshi Arcade!",
+    "wa": "https://wa.me/639678247845?text=%2Abounce"
+  },
+  {
+    "slug": "breakout",
+    "name": "BREAKOUT",
+    "command": "breakout",
+    "desc": "Breakout jogável por toque dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Abreakout"
+  },
+  {
+    "slug": "cacapalavras",
+    "name": "Cacapalavras",
+    "command": "cacapalavras",
+    "desc": "Caça-palavras: muitas fases, encontre as palavras escondidas.",
+    "wa": "https://wa.me/639678247845?text=%2Acacapalavras"
+  },
+  {
+    "slug": "calculadora",
+    "name": "CALCULADORA",
+    "command": "calculadora",
+    "desc": "Calculadora interativa dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Acalculadora"
+  },
+  {
+    "slug": "carro",
+    "name": "CARRO",
+    "command": "carro",
+    "desc": "Desvie dos carros e faça a maior pontuação.",
+    "wa": "https://wa.me/639678247845?text=%2Acarro"
+  },
+  {
+    "slug": "colorir",
+    "name": "Colorir",
+    "command": "colorir",
+    "desc": "Livro de colorir: escolha um desenho e pinte com as cores.",
+    "wa": "https://wa.me/639678247845?text=%2Acolorir"
+  },
+  {
+    "slug": "dino",
+    "name": "DINO RUNNER",
+    "command": "dino",
+    "desc": "Dino Runner jogável dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Adino"
+  },
+  {
+    "slug": "eclipse",
+    "name": "Eclipse",
+    "command": "eclipse",
+    "desc": "Eclipse: atire nas esferas inimigas e sobreviva.",
+    "wa": "https://wa.me/639678247845?text=%2Aeclipse"
+  },
+  {
+    "slug": "flappy-bird",
+    "name": "FLAPPY BIRD",
+    "command": "flappybird",
+    "desc": "Flappy Bird jogável dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Aflappybird"
+  },
+  {
+    "slug": "piano",
+    "name": "NEON PIANO",
+    "command": "piano",
+    "desc": "Neon Piano jogável dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Apiano"
+  },
+  {
+    "slug": "pianorich",
+    "name": "NEON PIANO",
+    "command": "pianorich",
+    "desc": "Neon Piano jogável dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Apianorich"
+  },
+  {
+    "slug": "pong",
+    "name": "NEON PONG",
+    "command": "richpong",
+    "desc": "Pong contra a CPU dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Arichpong"
+  },
+  {
+    "slug": "rich2048",
+    "name": "2048",
+    "command": "rich2048",
+    "desc": "2048 jogável por toque dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Arich2048"
+  },
+  {
+    "slug": "richslots",
+    "name": "NEON SLOTS",
+    "command": "richslots",
+    "desc": "Neon Slots jogável dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Arichslots"
+  },
+  {
+    "slug": "richsnake",
+    "name": "NEON SNAKE",
+    "command": "richsnake",
+    "desc": "Snake jogável por toque dentro do WhatsApp.",
+    "wa": "https://wa.me/639678247845?text=%2Arichsnake"
+  },
+  {
+    "slug": "richxo",
+    "name": "JOGO DA VELHA",
+    "command": "richxo",
+    "desc": "Jogo da Velha Rich contra IA ou para dois jogadores.",
+    "wa": "https://wa.me/639678247845?text=%2Arichxo"
+  },
+  {
+    "slug": "tetris",
+    "name": "Tetris",
+    "command": "tetris",
+    "desc": "Jogo do MSNK7BOT.",
+    "wa": "https://wa.me/639678247845?text=%2Atetris"
+  },
+  {
+    "slug": "tiroaoalvo",
+    "name": "Tiroaoalvo",
+    "command": "tiroaoalvo",
+    "desc": "Tiro ao alvo: acerte os alvos antes que sumam.",
+    "wa": "https://wa.me/639678247845?text=%2Atiroaoalvo"
+  },
+  {
+    "slug": "xadrez",
+    "name": "Xadrez",
+    "command": "xadrez",
+    "desc": "Jogo de xadrez com dois jogadores ou contra IA.",
+    "wa": "https://wa.me/639678247845?text=%2Axadrez"
+  }
+]

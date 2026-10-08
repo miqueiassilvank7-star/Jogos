@@ -1,0 +1,1022 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>CARRO</title><style>html{background:#0f171c;min-height:100%}body{min-height:100vh}.voltar{position:fixed;left:10px;bottom:10px;z-index:99999;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2)}</style></head><style>
+
+:root{
+  --accent-a:#8b6cf0;
+  --accent-b:#4fa8e0;
+  --ink:#f2f5f7;
+  --ink-dim:rgba(242,245,247,.55);
+  --ink-faint:rgba(242,245,247,.4);
+}
+*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-sizing:border-box}
+body{margin:0;background:transparent;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);touch-action:manipulation}
+.wrap{width:100%;max-width:620px;margin:auto;padding:16px}
+.card{background:linear-gradient(180deg,rgba(34,45,53,.97),rgba(24,33,40,.97));border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.head{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.15);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent-b);opacity:.85}
+.title{font-size:16px;font-weight:800;color:#fff;letter-spacing:.3px;margin-top:2px}
+.stats{display:flex;gap:16px;text-align:right}
+.value{font:800 17px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff;font-variant-numeric:tabular-nums}
+.label{font-size:8px;font-weight:700;color:var(--ink-faint);letter-spacing:1.2px;margin-bottom:3px}
+.main{padding:16px}
+.board{position:relative;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.05),rgba(0,0,0,0) 60%),rgba(4,9,12,.4);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:inset 0 0 24px rgba(0,0,0,.35)}
+.board canvas{display:block;width:100%;height:auto}
+.controls{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.button{min-height:46px;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;font-weight:700;font-size:12px;letter-spacing:.3px;background:rgba(255,255,255,.06);padding:0 16px;transition:transform .08s ease,filter .08s ease}
+.button:active{transform:scale(.94);filter:brightness(1.15)}
+.primary{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));border-color:rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(139,108,240,.35)}
+.status{text-align:center;font:10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink-faint);letter-spacing:.3px;margin-top:12px;min-height:12px}
+.overlay{position:absolute;inset:0;background:rgba(10,15,19,.88);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:5;animation:fade-in .18s ease}
+.overlay.hidden{display:none}
+.overlay-title{font-size:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,#fff,var(--accent-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.overlay-sub{font-size:11px;color:var(--ink-dim);letter-spacing:.2px;margin-top:8px;max-width:280px}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+
+
+body{
+  cursor:pointer;
+}
+
+.car-controls{
+  display:flex;
+  gap:0;
+  margin-top:10px;
+}
+
+.car-button{
+  flex:1;
+  height:48px;
+  border:1px solid rgba(255,255,255,.1);
+  color:#fff;
+  background:#17253a;
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:.4px;
+  border-radius:9px;
+  touch-action:manipulation;
+}
+
+.car-button:first-child{
+  border-radius:9px 4px 4px 9px;
+}
+
+.car-button:last-child{
+  border-radius:4px 9px 9px 4px;
+}
+
+.car-button:active{
+  transform:scale(.97);
+  filter:brightness(1.2);
+}
+
+.car-help{
+  text-align:center;
+  font-size:9px;
+  color:rgba(242,245,247,.4);
+  margin-top:9px;
+}
+</style>
+
+<body>
+
+<div class="wrap">
+
+<div class="card">
+
+<div class="head">
+
+<div>
+<div class="brand">MSNK7BOT</div>
+<div class="title">CARRO</div>
+</div>
+
+<div class="stats">
+
+<div>
+<div class="label">PONTOS</div>
+<div class="value" id="score">00000</div>
+</div>
+
+<div>
+<div class="label">RECORDE</div>
+<div class="value" id="best">00000</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="main">
+
+<div class="board" id="board">
+
+<canvas id="game" width="560" height="420"></canvas>
+
+<div id="overlay" class="overlay">
+
+<div id="gameTitle" class="overlay-title">
+CARRO
+</div>
+
+<div id="gameSub" class="overlay-sub">
+DESVIE DOS CARROS
+</div>
+
+<button
+id="start"
+class="button primary"
+style="margin-top:15px"
+>
+COMEÇAR
+</button>
+
+</div>
+
+</div>
+
+<div class="car-controls">
+
+<button id="left" class="car-button">
+◀ ESQ
+</button>
+
+<button id="right" class="car-button">
+DIR ▶
+</button>
+
+</div>
+
+<div id="status" class="car-help">
+USE OS BOTÕES OU AS SETAS ← →
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const board = document.getElementById("board");
+
+const scoreEl = document.getElementById("score");
+const bestEl = document.getElementById("best");
+const statusEl = document.getElementById("status");
+
+const overlay = document.getElementById("overlay");
+const gameTitle = document.getElementById("gameTitle");
+const gameSub = document.getElementById("gameSub");
+const start = document.getElementById("start");
+
+const leftButton = document.getElementById("left");
+const rightButton = document.getElementById("right");
+
+const WIDTH = 560;
+const HEIGHT = 420;
+
+const ROAD_LEFT = 70;
+const ROAD_RIGHT = 490;
+
+const ROAD_WIDTH = ROAD_RIGHT - ROAD_LEFT;
+
+const LANE_WIDTH = ROAD_WIDTH / 3;
+
+const PLAYER_W = 42;
+const PLAYER_H = 68;
+
+let lane = 1;
+
+let player = {
+  x: 0,
+  y: 0,
+  w: PLAYER_W,
+  h: PLAYER_H
+};
+
+let enemies = [];
+
+let score = 0;
+let best = 0;
+
+let playing = false;
+
+let speed = 3.4;
+
+let spawnTimer = 0;
+let lineOffset = 0;
+
+let last = 0;
+
+try{
+  best =
+    parseInt(
+      localStorage.getItem("takeshi_carro_best") || "0",
+      10
+    ) || 0;
+}catch(e){
+  best = 0;
+}
+
+
+/* =========================
+   UTILIDADES
+========================= */
+
+function pad(value){
+  return String(Math.floor(value)).padStart(5,"0");
+}
+
+
+function laneX(index, width){
+  return (
+    ROAD_LEFT +
+    index * LANE_WIDTH +
+    (LANE_WIDTH - width) / 2
+  );
+}
+
+
+function setPlayerPosition(){
+  player.x = laneX(lane, PLAYER_W);
+  player.y = HEIGHT - 88;
+}
+
+
+function updateUI(){
+
+  scoreEl.textContent = pad(score);
+
+  bestEl.textContent = pad(best);
+
+  statusEl.textContent =
+    "DESVIE DOS CARROS • VELOCIDADE " +
+    (speed / 3.4).toFixed(1) +
+    "x";
+
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+function reset(){
+
+  enemies = [];
+
+  score = 0;
+
+  speed = 3.4;
+
+  spawnTimer = 0;
+
+  lineOffset = 0;
+
+  lane = 1;
+
+  setPlayerPosition();
+
+  playing = true;
+
+  last = 0;
+
+  overlay.classList.add("hidden");
+
+  updateUI();
+
+}
+
+
+/* =========================
+   MOVIMENTO
+========================= */
+
+function moveLeft(){
+
+  if(!playing){
+    return;
+  }
+
+  if(lane > 0){
+
+    lane--;
+
+    setPlayerPosition();
+
+  }
+
+}
+
+
+function moveRight(){
+
+  if(!playing){
+    return;
+  }
+
+  if(lane < 2){
+
+    lane++;
+
+    setPlayerPosition();
+
+  }
+
+}
+
+
+/* =========================
+   CARROS
+========================= */
+
+function createEnemy(){
+
+  const enemyLane =
+    Math.floor(Math.random() * 3);
+
+  const colors = [
+    "#f04444",
+    "#a855f7",
+    "#f0b429",
+    "#25b864"
+  ];
+
+  const color =
+    colors[
+      Math.floor(Math.random() * colors.length)
+    ];
+
+  enemies.push({
+
+    lane: enemyLane,
+
+    x: laneX(enemyLane, PLAYER_W),
+
+    y: -80,
+
+    w: PLAYER_W,
+
+    h: PLAYER_H,
+
+    color: color,
+
+    speed:
+      speed *
+      (0.9 + Math.random() * 0.18)
+
+  });
+
+}
+
+
+/* =========================
+   COLISÃO
+========================= */
+
+function hit(a,b){
+
+  return (
+
+    a.x + 8 <
+    b.x + b.w - 7
+
+    &&
+
+    a.x + a.w - 8 >
+    b.x + 7
+
+    &&
+
+    a.y + 8 <
+    b.y + b.h - 8
+
+    &&
+
+    a.y + a.h - 7 >
+    b.y + 8
+
+  );
+
+}
+
+
+/* =========================
+   GAME OVER
+========================= */
+
+function gameOver(){
+
+  playing = false;
+
+  best =
+    Math.max(
+      best,
+      Math.floor(score)
+    );
+
+  try{
+
+    localStorage.setItem(
+      "takeshi_carro_best",
+      String(best)
+    );
+
+  }catch(e){}
+
+  gameTitle.textContent =
+    "GAME OVER";
+
+  gameSub.textContent =
+    "PONTOS " + pad(score) +
+    " • DESVIE DOS CARROS";
+
+  start.textContent =
+    "JOGAR NOVAMENTE";
+
+  overlay.classList.remove("hidden");
+
+  updateUI();
+
+}
+
+
+/* =========================
+   DESENHAR CARRO
+========================= */
+
+function drawCar(car, playerCar){
+
+  const px = Math.floor(car.x);
+  const py = Math.floor(car.y);
+
+  /*
+   * sombra
+   */
+
+  ctx.fillStyle =
+    "rgba(0,0,0,.35)";
+
+  ctx.fillRect(
+    px + 3,
+    py + 5,
+    car.w,
+    car.h
+  );
+
+
+  /*
+   * carro
+   */
+
+  ctx.fillStyle =
+    playerCar
+      ? "#20b8f2"
+      : car.color;
+
+  ctx.beginPath();
+
+  ctx.roundRect(
+    px,
+    py,
+    car.w,
+    car.h,
+    6
+  );
+
+  ctx.fill();
+
+
+  /*
+   * vidro
+   */
+
+  ctx.fillStyle =
+    "#18283d";
+
+  ctx.beginPath();
+
+  ctx.roundRect(
+    px + 7,
+    py + 8,
+    car.w - 14,
+    18,
+    4
+  );
+
+  ctx.fill();
+
+
+  /*
+   * pequeno reflexo no vidro
+   */
+
+  ctx.fillStyle =
+    "rgba(255,255,255,.12)";
+
+  ctx.fillRect(
+    px + 10,
+    py + 10,
+    car.w - 20,
+    3
+  );
+
+
+  /*
+   * parte inferior
+   */
+
+  ctx.fillStyle =
+    "#172235";
+
+  ctx.fillRect(
+    px + 7,
+    py + car.h - 14,
+    car.w - 14,
+    7
+  );
+
+
+  /*
+   * rodas
+   */
+
+  ctx.fillStyle =
+    "#0b111b";
+
+  ctx.fillRect(
+    px - 3,
+    py + 13,
+    5,
+    16
+  );
+
+  ctx.fillRect(
+    px + car.w - 2,
+    py + 13,
+    5,
+    16
+  );
+
+  ctx.fillRect(
+    px - 3,
+    py + car.h - 29,
+    5,
+    16
+  );
+
+  ctx.fillRect(
+    px + car.w - 2,
+    py + car.h - 29,
+    5,
+    16
+  );
+
+}
+
+
+/* =========================
+   DESENHAR PISTA
+========================= */
+
+function drawRoad(){
+
+  /*
+   * fundo
+   */
+
+  ctx.fillStyle =
+    "#111b2b";
+
+  ctx.fillRect(
+    0,
+    0,
+    WIDTH,
+    HEIGHT
+  );
+
+
+  /*
+   * estrada
+   */
+
+  ctx.fillStyle =
+    "#1d2b44";
+
+  ctx.fillRect(
+    ROAD_LEFT,
+    0,
+    ROAD_WIDTH,
+    HEIGHT
+  );
+
+
+  /*
+   * borda esquerda
+   */
+
+  ctx.fillStyle =
+    "#e63d43";
+
+  ctx.fillRect(
+    ROAD_LEFT,
+    0,
+    7,
+    HEIGHT
+  );
+
+
+  /*
+   * borda direita
+   */
+
+  ctx.fillRect(
+    ROAD_RIGHT - 7,
+    0,
+    7,
+    HEIGHT
+  );
+
+
+  /*
+   * faixas brancas
+   */
+
+  ctx.fillStyle =
+    "rgba(255,255,255,.92)";
+
+  const dashH = 38;
+  const gap = 30;
+  const total = dashH + gap;
+
+  const offset =
+    lineOffset % total;
+
+  for(let laneLine = 1; laneLine <= 2; laneLine++){
+
+    const x =
+      ROAD_LEFT +
+      laneLine * LANE_WIDTH -
+      2;
+
+    for(
+      let y = -total + offset;
+      y < HEIGHT;
+      y += total
+    ){
+
+      ctx.fillRect(
+        x,
+        y,
+        4,
+        dashH
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================
+   DESENHAR
+========================= */
+
+function draw(){
+
+  ctx.clearRect(
+    0,
+    0,
+    WIDTH,
+    HEIGHT
+  );
+
+  drawRoad();
+
+
+  /*
+   * carros inimigos
+   */
+
+  enemies.forEach(function(enemy){
+
+    drawCar(
+      enemy,
+      false
+    );
+
+  });
+
+
+  /*
+   * jogador
+   */
+
+  drawCar(
+    player,
+    true
+  );
+
+}
+
+
+/* =========================
+   ATUALIZAÇÃO
+========================= */
+
+function update(dt){
+
+  /*
+   * aumenta a velocidade
+   */
+
+  speed =
+    Math.min(
+      8.5,
+      3.4 + score / 350
+    );
+
+
+  /*
+   * pontuação
+   */
+
+  score +=
+    0.12 *
+    speed *
+    dt;
+
+
+  /*
+   * linhas da pista
+   */
+
+  lineOffset +=
+    speed *
+    1.7 *
+    dt;
+
+
+  /*
+   * gerar carros
+   */
+
+  spawnTimer -=
+    speed *
+    dt;
+
+
+  if(spawnTimer <= 0){
+
+    /*
+     * evita ficar impossível
+     */
+
+    const nearTop =
+      enemies.some(function(enemy){
+
+        return enemy.y < 120;
+
+      });
+
+
+    if(!nearTop){
+
+      createEnemy();
+
+    }
+
+
+    spawnTimer =
+      Math.max(
+        65,
+        125 -
+        speed * 7 +
+        Math.random() * 45
+      );
+
+  }
+
+
+  /*
+   * mover inimigos
+   */
+
+  for(
+    let i = enemies.length - 1;
+    i >= 0;
+    i--
+  ){
+
+    const enemy =
+      enemies[i];
+
+    enemy.y +=
+      enemy.speed *
+      dt;
+
+
+    /*
+     * colisão
+     */
+
+    if(
+      hit(
+        player,
+        enemy
+      )
+    ){
+
+      gameOver();
+
+      return;
+
+    }
+
+
+    /*
+     * saiu da tela
+     */
+
+    if(
+      enemy.y >
+      HEIGHT + 90
+    ){
+
+      enemies.splice(
+        i,
+        1
+      );
+
+    }
+
+  }
+
+
+  updateUI();
+
+}
+
+
+/* =========================
+   LOOP
+========================= */
+
+function loop(time){
+
+  if(!last){
+    last = time;
+  }
+
+  const dt =
+    Math.min(
+      (time - last) / 16.67,
+      2
+    );
+
+  last = time;
+
+
+  if(playing){
+
+    update(dt);
+
+  }
+
+
+  draw();
+
+  requestAnimationFrame(loop);
+
+}
+
+
+/* =========================
+   CONTROLES
+========================= */
+
+leftButton.addEventListener(
+  "pointerdown",
+  function(e){
+
+    e.preventDefault();
+
+    moveLeft();
+
+  }
+);
+
+
+rightButton.addEventListener(
+  "pointerdown",
+  function(e){
+
+    e.preventDefault();
+
+    moveRight();
+
+  }
+);
+
+
+start.addEventListener(
+  "pointerdown",
+  function(e){
+
+    e.preventDefault();
+
+    e.stopPropagation();
+
+    reset();
+
+  }
+);
+
+
+/* =========================
+   TECLADO
+========================= */
+
+document.addEventListener(
+  "keydown",
+  function(e){
+
+    if(
+      e.key === "ArrowLeft"
+    ){
+
+      e.preventDefault();
+
+      moveLeft();
+
+    }
+
+
+    if(
+      e.key === "ArrowRight"
+    ){
+
+      e.preventDefault();
+
+      moveRight();
+
+    }
+
+
+    if(
+      e.code === "Space" &&
+      !playing
+    ){
+
+      e.preventDefault();
+
+      reset();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   TOQUE NO CANVAS
+========================= */
+
+board.addEventListener(
+  "pointerdown",
+  function(e){
+
+    if(
+      e.target === start ||
+      e.target === leftButton ||
+      e.target === rightButton
+    ){
+
+      return;
+
+    }
+
+    e.preventDefault();
+
+  }
+);
+
+
+/* =========================
+   TAMANHO
+========================= */
+
+setPlayerPosition();
+
+updateUI();
+
+draw();
+
+requestAnimationFrame(loop);
+
+</script>
+
+</body><a class="voltar" href="../">← Catálogo</a></html>
